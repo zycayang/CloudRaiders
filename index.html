@@ -1,0 +1,3788 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+  <title>《雲端奇兵：星辰脈衝》Cloud Raiders: Star Pulse - Stage 1: 碧空浮島 (強化版)</title>
+  <style>
+    :root {
+      --bg-deep: #181430;
+      --panel-bg: rgba(31, 25, 62, 0.95);
+      --border-dark: #211742;
+      --accent-gold: #ffd166;
+      --accent-red: #ff6b8b;
+      --accent-blue: #4cc9f0;
+      --accent-green: #57cc99;
+      --text-main: #fff9f5;
+      --text-muted: #c8bfe7;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      overflow: hidden;
+      background: radial-gradient(circle at 30% 20%, #3b336a 0%, #1a1530 70%, #0f0c1d 100%);
+      font-family: "Microsoft JhengHei", "PingFang TC", "Noto Sans TC", sans-serif;
+      color: var(--text-main);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #app-layout {
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      gap: 16px;
+      width: 100%;
+      max-width: 1260px;
+      height: 97vh;
+      max-height: 920px;
+      padding: 8px 16px;
+    }
+
+    /* 左側資訊與操作面板 */
+    .side-panel {
+      width: 300px;
+      flex-shrink: 0;
+      background: var(--panel-bg);
+      border: 4px solid #3c3270;
+      border-radius: 24px;
+      padding: 14px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.45), inset 0 3px 0 rgba(255, 255, 255, 0.18);
+      overflow-y: auto;
+    }
+
+    .brand-box {
+      background: linear-gradient(135deg, #4b3f8c, #2f265e);
+      border: 3px solid #201844;
+      border-radius: 16px;
+      padding: 10px 12px;
+      text-align: center;
+      box-shadow: 0 5px 0 #1b1438, inset 0 2px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    .brand-title {
+      font-size: 19px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: 1px;
+      text-shadow: 0 3px 0 #1d143b;
+    }
+
+    .brand-sub {
+      font-size: 11.5px;
+      color: var(--accent-gold);
+      margin-top: 3px;
+      font-weight: 700;
+    }
+
+    .card-section {
+      background: rgba(22, 18, 45, 0.68);
+      border: 2.5px solid #352c63;
+      border-radius: 16px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .card-title {
+      font-size: 13.5px;
+      font-weight: 800;
+      color: var(--accent-gold);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px dashed rgba(255, 255, 255, 0.12);
+      padding-bottom: 4px;
+    }
+
+    .key-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 12px;
+      color: #eae4ff;
+      line-height: 1.35;
+    }
+
+    .kbd {
+      display: inline-block;
+      background: linear-gradient(180deg, #6254a8, #443880);
+      border: 2px solid #221a47;
+      border-bottom-width: 3px;
+      border-radius: 7px;
+      padding: 1px 6px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .weapon-badge-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .weapon-item {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 11px;
+      padding: 5px 8px;
+      border: 2px solid transparent;
+      transition: transform 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .weapon-item.active {
+      border-color: var(--accent-gold);
+      background: rgba(255, 209, 102, 0.14);
+      transform: scale(1.01);
+    }
+
+    .weapon-item svg {
+      width: 30px;
+      height: 30px;
+      flex-shrink: 0;
+    }
+
+    .weapon-desc-title {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .weapon-desc-sub {
+      font-size: 10.5px;
+      color: var(--text-muted);
+    }
+
+    /* 中央遊戲主欄（上方獨立儀表板 + 下方 100% 無遮擋遊戲戰場） */
+    #center-column {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      aspect-ratio: 3 / 4.55;
+      max-height: 910px;
+      gap: 6px;
+    }
+
+    /* 獨立於遊戲戰場外部的頂部 HUD 儀表板（絕不遮擋任何敵機與 Boss） */
+    #external-hud {
+      background: var(--panel-bg);
+      border: 4px solid #3c3270;
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), inset 0 2px 0 rgba(255, 255, 255, 0.2);
+      flex-shrink: 0;
+    }
+
+    .hud-main-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .hud-bars {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px 12px;
+    }
+
+    .bar-row {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .bar-label {
+      font-size: 11px;
+      font-weight: 900;
+      width: 34px;
+      text-shadow: 0 2px 0 #171130;
+    }
+
+    .bar-track {
+      flex: 1;
+      height: 12px;
+      background: #140f29;
+      border: 2px solid #0b0718;
+      border-radius: 999px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .bar-fill {
+      height: 100%;
+      border-radius: 999px;
+      transition: width 0.08s ease-out;
+      position: relative;
+    }
+
+    .bar-fill::after {
+      content: "";
+      position: absolute;
+      top: 1px;
+      left: 3px;
+      right: 3px;
+      height: 3.5px;
+      background: rgba(255, 255, 255, 0.42);
+      border-radius: 999px;
+    }
+
+    #shield-fill {
+      background: linear-gradient(90deg, #38b6ff, #72efdd);
+      width: 100%;
+    }
+
+    #hp-fill {
+      background: linear-gradient(90deg, #ff5d8f, #ff9e00);
+      width: 100%;
+    }
+
+    #charge-fill {
+      background: linear-gradient(90deg, #ffd166, #ff5400);
+      width: 0%;
+    }
+
+    #progress-fill {
+      background: linear-gradient(90deg, #57cc99, #ffd166);
+      width: 0%;
+    }
+
+    .bar-val {
+      font-size: 11px;
+      font-weight: 900;
+      width: 34px;
+      text-align: right;
+    }
+
+    .hud-score-box {
+      text-align: right;
+      min-width: 155px;
+      padding-left: 8px;
+      border-left: 2px dashed rgba(255, 255, 255, 0.15);
+    }
+
+    .score-num {
+      font-size: 20px;
+      font-weight: 900;
+      color: var(--accent-gold);
+      letter-spacing: 1px;
+      text-shadow: 0 2px 0 #1a1236;
+      line-height: 1.1;
+    }
+
+    .hud-sub-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 6px;
+      margin-top: 3px;
+      font-size: 11.5px;
+      font-weight: 800;
+    }
+
+    /* 外部 Boss 專屬血條與狀態通知列 */
+    #hud-status-strip {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      min-height: 22px;
+      background: rgba(18, 13, 38, 0.72);
+      border-radius: 10px;
+      padding: 3px 10px;
+      border: 1.5px solid #352b61;
+    }
+
+    #toast-banner {
+      font-size: 12px;
+      font-weight: 800;
+      color: #fff3b0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      flex: 1;
+    }
+
+    #boss-hud {
+      display: none;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+    }
+
+    .boss-tag {
+      font-size: 11.5px;
+      font-weight: 900;
+      color: #ff8fa3;
+      white-space: nowrap;
+    }
+
+    #boss-hp-fill {
+      background: linear-gradient(90deg, #ff2a6d, #ff7b00, #ffd166);
+      width: 100%;
+    }
+
+    /* 遊戲純 SVG 視窗（100% 乾淨視野，無 UI 遮擋） */
+    #stage-container {
+      position: relative;
+      flex: 1;
+      width: 100%;
+      background: #72c8ff;
+      border: 5px solid #2c2255;
+      border-radius: 24px;
+      box-shadow: 0 18px 44px rgba(0, 0, 0, 0.65), 0 0 0 3px #574996;
+      overflow: hidden;
+    }
+
+    #game-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    /* 覆蓋式選單（標題、圖鑑、結算、失敗） */
+    .overlay-screen {
+      position: absolute;
+      inset: 0;
+      background: rgba(22, 17, 46, 0.84);
+      backdrop-filter: blur(5px);
+      z-index: 30;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .overlay-screen.hidden {
+      display: none;
+    }
+
+    .modal-card {
+      width: 100%;
+      max-width: 500px;
+      max-height: 95%;
+      overflow-y: auto;
+      background: linear-gradient(180deg, #3c3173 0%, #271f51 100%);
+      border: 5px solid #1d153e;
+      border-radius: 28px;
+      padding: 18px 22px;
+      box-shadow: 0 14px 0 #161030, 0 22px 44px rgba(0,0,0,0.6), inset 0 4px 0 rgba(255,255,255,0.25);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-emblem {
+      width: 104px;
+      height: 104px;
+    }
+
+    .modal-title {
+      font-size: 26px;
+      font-weight: 900;
+      color: #fff;
+      text-shadow: 0 4px 0 #191238;
+      letter-spacing: 1px;
+    }
+
+    .modal-subtitle {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--accent-gold);
+      margin-top: -6px;
+    }
+
+    .loadout-grid {
+      width: 100%;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .loadout-option {
+      background: rgba(20, 15, 42, 0.65);
+      border: 3px solid #4a3e85;
+      border-radius: 14px;
+      padding: 8px 6px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .loadout-option:hover {
+      transform: translateY(-2px);
+      border-color: #8f80d8;
+    }
+
+    .loadout-option.selected {
+      background: rgba(255, 209, 102, 0.18);
+      border-color: var(--accent-gold);
+      box-shadow: 0 4px 0 #1b1438;
+    }
+
+    .loadout-title {
+      font-size: 12px;
+      font-weight: 900;
+      color: #fff;
+    }
+
+    .loadout-desc {
+      font-size: 10.5px;
+      color: var(--text-muted);
+      line-height: 1.25;
+    }
+
+    .mode-switch {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .mode-pill {
+      flex: 1;
+      padding: 7px 10px;
+      border-radius: 13px;
+      border: 3px solid #4a3e85;
+      background: rgba(20, 15, 42, 0.65);
+      color: #fff;
+      font-weight: 800;
+      font-size: 12.5px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .mode-pill.selected {
+      background: linear-gradient(180deg, #57cc99, #38a3a5);
+      border-color: #183a37;
+      color: #fff;
+      text-shadow: 0 2px 0 #183a37;
+      box-shadow: 0 4px 0 #142f2c;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 10px;
+      width: 100%;
+      justify-content: center;
+      margin-top: 2px;
+    }
+
+    .cartoon-btn {
+      flex: 1;
+      padding: 11px 16px;
+      border-radius: 16px;
+      border: 3.5px solid #1e153d;
+      font-size: 15px;
+      font-weight: 900;
+      color: #fff;
+      cursor: pointer;
+      text-shadow: 0 2px 0 rgba(0, 0, 0, 0.45);
+      box-shadow: 0 5px 0 #191136, inset 0 3px 0 rgba(255, 255, 255, 0.35);
+      transition: transform 0.1s, box-shadow 0.1s;
+    }
+
+    .cartoon-btn:active {
+      transform: translateY(3px);
+      box-shadow: 0 2px 0 #191136, inset 0 2px 0 rgba(255, 255, 255, 0.35);
+    }
+
+    .btn-primary {
+      background: linear-gradient(180deg, #ff758f 0%, #ff4769 100%);
+    }
+
+    .btn-secondary {
+      background: linear-gradient(180deg, #5e60ce 0%, #4846a8 100%);
+      flex: 0.65;
+    }
+
+    /* 圖鑑展示格 (12種敵機 + 玩家與道具) */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      width: 100%;
+      max-height: 370px;
+      overflow-y: auto;
+      padding: 4px;
+    }
+
+    .gallery-item {
+      background: rgba(20, 15, 42, 0.72);
+      border: 2px solid #4a3e85;
+      border-radius: 14px;
+      padding: 8px 4px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+    }
+
+    .gallery-item svg {
+      width: 58px;
+      height: 58px;
+    }
+
+    .gallery-name {
+      font-size: 11.5px;
+      font-weight: 800;
+      color: var(--accent-gold);
+    }
+
+    .gallery-role {
+      font-size: 10px;
+      color: var(--text-muted);
+    }
+
+    .stats-box {
+      width: 100%;
+      background: rgba(18, 13, 38, 0.7);
+      border: 2.5px solid #493c82;
+      border-radius: 16px;
+      padding: 10px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+    }
+
+    .stat-line {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13.5px;
+      font-weight: 800;
+    }
+
+    .top-ctrl-btns {
+      display: flex;
+      gap: 6px;
+    }
+
+    .mini-btn {
+      flex: 1;
+      padding: 6px 8px;
+      border-radius: 11px;
+      border: 2.5px solid #201742;
+      background: linear-gradient(180deg, #524596, #382e6e);
+      color: #fff;
+      font-size: 11.5px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 3px 0 #191136;
+    }
+
+    .mini-btn:active {
+      transform: translateY(2px);
+      box-shadow: 0 1px 0 #191136;
+    }
+
+    @media (max-width: 960px) {
+      .side-panel {
+        display: none;
+      }
+      #app-layout {
+        padding: 4px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="app-layout">
+    <!-- 左側企劃與操作說明欄 -->
+    <aside class="side-panel">
+      <div class="brand-box">
+        <div class="brand-title">雲端奇兵：星辰脈衝</div>
+        <div class="brand-sub">STAGE 1：碧空浮島（3倍長征強化版）</div>
+      </div>
+
+      <div class="top-ctrl-btns">
+        <button class="mini-btn" id="btn-mute">音效：開啟</button>
+        <button class="mini-btn" id="btn-pause">暫停 (P)</button>
+        <button class="mini-btn" id="btn-open-gallery">SVG 圖鑑 (16)</button>
+      </div>
+
+      <div class="card-section">
+        <div class="card-title">
+          <span>鍵盤操作指南</span>
+          <span style="font-size:11px; color:#57cc99;">零遮擋視野</span>
+        </div>
+        <div class="key-row">
+          <span>移動機體 (1P)</span>
+          <span><kbd class="kbd">WASD</kbd> 或 <kbd class="kbd">方向鍵</kbd></span>
+        </div>
+        <div class="key-row">
+          <span>連發射擊 / 長按蓄力</span>
+          <span><kbd class="kbd">Space</kbd> / <kbd class="kbd">Z</kbd> / <kbd class="kbd">J</kbd></span>
+        </div>
+        <div class="key-row">
+          <span>釋放蓄力重擊</span>
+          <span>放開射擊 或 <kbd class="kbd">X</kbd> / <kbd class="kbd">K</kbd></span>
+        </div>
+        <div class="key-row">
+          <span>EMP 脈衝炸彈 (吸水晶)</span>
+          <span><kbd class="kbd">C</kbd> / <kbd class="kbd">L</kbd> / <kbd class="kbd">Shift</kbd></span>
+        </div>
+        <div class="key-row" style="color:#a9f5d0; font-size:11px;">
+          <span>雙人模式：1P 用 WASD+JKL，2P 用方向鍵+ZXC</span>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <div class="card-title">彈跳水晶進化系統 (Lv.1~Lv.8 MAX)</div>
+        <div style="font-size:11px; color:#d8d0f8; line-height:1.4;">
+          擊破<b style="color:#ffd166;">氣球浮標</b>掉出核心水晶！用子彈射擊水晶可<b style="color:#72efdd;">向上反彈並變色（紅→藍→黃）</b>，連續吸收同色水晶可由 <b>Lv.1 (1路)</b> 逐步進化至 <b>Lv.8 (MAX)</b>！
+        </div>
+        <div class="weapon-badge-list">
+          <div class="weapon-item active" id="badge-red">
+            <svg viewBox="0 0 80 80"><use href="#icon-crystal-red" /></svg>
+            <div>
+              <div class="weapon-desc-title" style="color:#ff8fa3;">紅色：火神連射砲</div>
+              <div class="weapon-desc-sub">1~8 路扇形散彈｜蓄力：超載火網</div>
+            </div>
+          </div>
+          <div class="weapon-item" id="badge-blue">
+            <svg viewBox="0 0 80 80"><use href="#icon-crystal-blue" /></svg>
+            <div>
+              <div class="weapon-desc-title" style="color:#72efdd;">藍色：電漿聚焦雷射</div>
+              <div class="weapon-desc-sub">1~8 道貫穿消彈雷射｜蓄力：離子巨砲</div>
+            </div>
+          </div>
+          <div class="weapon-item" id="badge-yellow">
+            <svg viewBox="0 0 80 80"><use href="#icon-crystal-yellow" /></svg>
+            <div>
+              <div class="weapon-desc-title" style="color:#ffd166;">黃色：蜂巢追蹤飛彈</div>
+              <div class="weapon-desc-sub">1~8 枚前方導引飛彈｜蓄力：24枚齊射</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card-section">
+        <div class="card-title">第一關敵軍情報 (12種敵機登場)</div>
+        <div style="font-size:11px; color:#d8d0f8; line-height:1.42;">
+          • <b style="color:#72efdd;">能量護盾</b>：受擊時無敵並震開周圍小彈幕；未受擊 3 秒後快速充能。<br/>
+          • <b style="color:#ff8fa3;">重盾守衛＆中Boss</b>：切換藍色雷射或釋放蓄力重擊可貫穿破盾！擊毀鐵甲鯨與巡洋艦可拾取<b style="color:#57cc99;">維修扳手 (+35 HP)</b>。
+        </div>
+      </div>
+    </aside>
+
+    <!-- 中央主欄：上方獨立 HUD + 下方 100% 無遮擋遊戲舞台 -->
+    <div id="center-column">
+      <!-- 獨立於戰場外的頂部 HUD 儀表板 -->
+      <header id="external-hud">
+        <div class="hud-main-row">
+          <div class="hud-bars">
+            <div class="bar-row">
+              <span class="bar-label" style="color:#72efdd;">護盾</span>
+              <div class="bar-track"><div class="bar-fill" id="shield-fill"></div></div>
+              <span class="bar-val" id="shield-text">100</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label" style="color:#ff8fa3;">裝甲</span>
+              <div class="bar-track"><div class="bar-fill" id="hp-fill"></div></div>
+              <span class="bar-val" id="hp-text">100</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label" style="color:#ffd166;">蓄力</span>
+              <div class="bar-track"><div class="bar-fill" id="charge-fill"></div></div>
+              <span class="bar-val" id="charge-text">0%</span>
+            </div>
+            <div class="bar-row">
+              <span class="bar-label" style="color:#57cc99;">航程</span>
+              <div class="bar-track"><div class="bar-fill" id="progress-fill"></div></div>
+              <span class="bar-val" id="progress-text">0%</span>
+            </div>
+          </div>
+
+          <div class="hud-score-box">
+            <div class="score-num" id="score-display">000000</div>
+            <div class="hud-sub-row">
+              <span id="weapon-hud-tag" style="color:#ff8fa3;">火神砲 Lv.1</span>
+              <span>|</span>
+              <span style="color:#72efdd;">EMP:<b id="bomb-count">3</b></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部狀態列：平時顯示波次提示，Boss 戰時切換為 Boss 巨型血條 -->
+        <div id="hud-status-strip">
+          <div id="toast-banner">STAGE 1：碧空浮島 — 準備升空迎戰！</div>
+          <div id="boss-hud">
+            <span class="boss-tag" id="boss-name-label">BOSS：風車要塞號</span>
+            <div class="bar-track" style="height:11px; flex:1;">
+              <div class="bar-fill" id="boss-hp-fill"></div>
+            </div>
+            <span id="boss-hp-percent" style="font-size:11px; font-weight:900; color:#ffd166; width:42px; text-align:right;">100%</span>
+          </div>
+        </div>
+      </header>
+
+      <!-- 純 SVG 遊戲戰場 (600x800 完整視野無任何 UI 遮擋) -->
+      <main id="stage-container">
+        <svg id="game-svg" viewBox="0 0 600 800" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <!-- 天空與材質漸層 (固定左上方光源，遵循 svg.md 與 RF.jpg) -->
+            <linearGradient id="sky-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stop-color="#80edff" />
+              <stop offset="45%" stop-color="#56bfe8" />
+              <stop offset="100%" stop-color="#3a86d4" />
+            </linearGradient>
+
+            <linearGradient id="cream-body" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="65%" stop-color="#f3e9dc" />
+              <stop offset="100%" stop-color="#d5c3aa" />
+            </linearGradient>
+
+            <linearGradient id="brass-grad" x1="10%" y1="10%" x2="90%" y2="90%">
+              <stop offset="0%" stop-color="#ffe985" />
+              <stop offset="55%" stop-color="#f7b844" />
+              <stop offset="100%" stop-color="#c97a1d" />
+            </linearGradient>
+
+            <linearGradient id="player1-wing" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#ff9ebb" />
+              <stop offset="50%" stop-color="#ff5d8f" />
+              <stop offset="100%" stop-color="#c92a5b" />
+            </linearGradient>
+
+            <linearGradient id="player2-wing" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#9bf6ff" />
+              <stop offset="50%" stop-color="#4cc9f0" />
+              <stop offset="100%" stop-color="#277da1" />
+            </linearGradient>
+
+            <radialGradient id="canopy-glass" cx="30%" cy="28%" r="65%">
+              <stop offset="0%" stop-color="#d8f8ff" />
+              <stop offset="45%" stop-color="#48cae4" />
+              <stop offset="100%" stop-color="#1d4e89" />
+            </radialGradient>
+
+            <radialGradient id="egg-yolk-core" cx="32%" cy="28%" r="65%">
+              <stop offset="0%" stop-color="#fff3b0" />
+              <stop offset="45%" stop-color="#ffb703" />
+              <stop offset="100%" stop-color="#e85d04" />
+            </radialGradient>
+
+            <linearGradient id="purple-pan-rim" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#8b68c7" />
+              <stop offset="55%" stop-color="#5e439c" />
+              <stop offset="100%" stop-color="#3c286b" />
+            </linearGradient>
+
+            <linearGradient id="purple-pan-inner" x1="80%" y1="80%" x2="15%" y2="15%">
+              <stop offset="0%" stop-color="#4c357d" />
+              <stop offset="100%" stop-color="#2c1d4f" />
+            </linearGradient>
+
+            <linearGradient id="island-grass" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#a7f3a0" />
+              <stop offset="55%" stop-color="#6dd47e" />
+              <stop offset="100%" stop-color="#3ca35c" />
+            </linearGradient>
+
+            <linearGradient id="island-rock" x1="15%" y1="10%" x2="85%" y2="90%">
+              <stop offset="0%" stop-color="#e6b89c" />
+              <stop offset="55%" stop-color="#c08562" />
+              <stop offset="100%" stop-color="#855238" />
+            </linearGradient>
+
+            <linearGradient id="enemy-red-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#ffadad" />
+              <stop offset="50%" stop-color="#ff6b6b" />
+              <stop offset="100%" stop-color="#b53838" />
+            </linearGradient>
+
+            <linearGradient id="enemy-teal-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#b8f2e6" />
+              <stop offset="50%" stop-color="#57cc99" />
+              <stop offset="100%" stop-color="#227c62" />
+            </linearGradient>
+
+            <linearGradient id="enemy-orange-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#ffd6a5" />
+              <stop offset="50%" stop-color="#ff9f1c" />
+              <stop offset="100%" stop-color="#c95b0c" />
+            </linearGradient>
+
+            <linearGradient id="enemy-cyan-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#caf0f8" />
+              <stop offset="50%" stop-color="#00b4d8" />
+              <stop offset="100%" stop-color="#0077b6" />
+            </linearGradient>
+
+            <linearGradient id="crystal-red-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#ffc2d1" />
+              <stop offset="45%" stop-color="#ff4d6d" />
+              <stop offset="100%" stop-color="#a4133c" />
+            </linearGradient>
+
+            <linearGradient id="crystal-blue-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#caf0f8" />
+              <stop offset="45%" stop-color="#00b4d8" />
+              <stop offset="100%" stop-color="#03045e" />
+            </linearGradient>
+
+            <linearGradient id="crystal-yellow-grad" x1="15%" y1="15%" x2="85%" y2="85%">
+              <stop offset="0%" stop-color="#fff3b0" />
+              <stop offset="45%" stop-color="#ffb703" />
+              <stop offset="100%" stop-color="#ca6702" />
+            </linearGradient>
+
+            <!-- =========================================================
+                 1. 玩家 1P 戰機：「星辰飛燕號」(內建向量外陰影，高效能零卡頓)
+                 ========================================================= -->
+            <g id="sprite-player-1">
+              <!-- 柔和立體外陰影層 -->
+              <ellipse cx="4" cy="8" rx="34" ry="24" fill="rgba(20, 14, 44, 0.35)" />
+              <!-- 尾焰推進光 -->
+              <ellipse cx="-12" cy="30" rx="5" ry="11" fill="#48cae4" opacity="0.85" />
+              <ellipse cx="12" cy="30" rx="5" ry="11" fill="#48cae4" opacity="0.85" />
+              <ellipse cx="-12" cy="28" rx="3" ry="6" fill="#ffffff" />
+              <ellipse cx="12" cy="28" rx="3" ry="6" fill="#ffffff" />
+              <!-- 圓潤主機翼 -->
+              <path d="M -34,6 C -36,-6 -22,-14 -12,-14 L 12,-14 C 22,-14 36,-6 34,6 C 33,16 22,20 14,18 L -14,18 C -22,20 -33,16 -34,6 Z"
+                    fill="url(#player1-wing)" stroke="#2b193d" stroke-width="3.5" stroke-linejoin="round" />
+              <path d="M -28,2 C -28,-5 -19,-10 -12,-10 L 10,-10" fill="none" stroke="#ffd6e5" stroke-width="3" stroke-linecap="round" opacity="0.75" />
+              <!-- 黃銅尾翼與雙噴嘴 -->
+              <rect x="-18" y="16" width="11" height="10" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <rect x="7" y="16" width="11" height="10" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <!-- 圓潤蛋型機身 -->
+              <path d="M 0,-32 C 13,-30 18,-12 17,12 C 16,24 9,28 0,28 C -9,28 -16,24 -17,12 C -18,-12 -13,-30 0,-32 Z"
+                    fill="url(#cream-body)" stroke="#2b193d" stroke-width="3.5" />
+              <ellipse cx="0" cy="-31" rx="7" ry="4.5" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <!-- 頂視圓形玻璃座艙罩 -->
+              <circle cx="0" cy="-4" r="11.5" fill="#1b3a5c" stroke="#2b193d" stroke-width="3.2" />
+              <circle cx="0" cy="-4" r="9.2" fill="url(#canopy-glass)" />
+              <ellipse cx="-3.5" cy="-7.5" rx="4.2" ry="2.6" transform="rotate(-25 -3.5 -7.5)" fill="#ffffff" opacity="0.85" />
+              <path d="M -9,-22 C -12,-10 -12,6 -9,18" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" opacity="0.8" />
+            </g>
+
+            <!-- =========================================================
+                 2. 玩家 2P 戰機：「蒼藍海燕號」
+                 ========================================================= -->
+            <g id="sprite-player-2">
+              <ellipse cx="4" cy="8" rx="34" ry="24" fill="rgba(20, 14, 44, 0.35)" />
+              <ellipse cx="-12" cy="30" rx="5" ry="11" fill="#ffd166" opacity="0.85" />
+              <ellipse cx="12" cy="30" rx="5" ry="11" fill="#ffd166" opacity="0.85" />
+              <path d="M -34,6 C -36,-6 -22,-14 -12,-14 L 12,-14 C 22,-14 36,-6 34,6 C 33,16 22,20 14,18 L -14,18 C -22,20 -33,16 -34,6 Z"
+                    fill="url(#player2-wing)" stroke="#2b193d" stroke-width="3.5" stroke-linejoin="round" />
+              <rect x="-18" y="16" width="11" height="10" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <rect x="7" y="16" width="11" height="10" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <path d="M 0,-32 C 13,-30 18,-12 17,12 C 16,24 9,28 0,28 C -9,28 -16,24 -17,12 C -18,-12 -13,-30 0,-32 Z"
+                    fill="url(#cream-body)" stroke="#2b193d" stroke-width="3.5" />
+              <ellipse cx="0" cy="-31" rx="7" ry="4.5" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <circle cx="0" cy="-4" r="11.5" fill="#4a2c11" stroke="#2b193d" stroke-width="3.2" />
+              <circle cx="0" cy="-4" r="9.2" fill="url(#egg-yolk-core)" />
+              <ellipse cx="-3.5" cy="-7.5" rx="4.2" ry="2.6" transform="rotate(-25 -3.5 -7.5)" fill="#ffffff" opacity="0.85" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 1 (buoy)：空中氣球浮標 (擊破掉彈跳水晶)
+                 ========================================================= -->
+            <g id="sprite-enemy-buoy">
+              <circle cx="3" cy="6" r="22" fill="rgba(20, 14, 44, 0.32)" />
+              <circle cx="0" cy="0" r="22" fill="url(#enemy-red-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M -21,0 L 21,0 M 0,-21 L 0,21" stroke="#fff3e6" stroke-width="6" stroke-linecap="round" />
+              <circle cx="0" cy="0" r="22" fill="none" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M -15,-10 A 18,18 0 0,1 10,-15" fill="none" stroke="#ffd6e0" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+              <circle cx="0" cy="0" r="11" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <circle cx="0" cy="0" r="6" fill="url(#canopy-glass)" />
+              <circle cx="-2" cy="-2" r="2" fill="#ffffff" opacity="0.9" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 2 (pan)：紫晶太陽圓盤機 (完全致敬 RF.jpg)
+                 ========================================================= -->
+            <g id="sprite-enemy-pan">
+              <circle cx="4" cy="6" r="23" fill="rgba(20, 14, 44, 0.35)" />
+              <g transform="rotate(38)">
+                <rect x="-7" y="19" width="14" height="19" rx="6" fill="url(#purple-pan-rim)" stroke="#261747" stroke-width="3.2" />
+                <circle cx="0" cy="31" r="3.2" fill="#80edff" stroke="#261747" stroke-width="2" />
+              </g>
+              <circle cx="0" cy="0" r="23" fill="url(#purple-pan-rim)" stroke="#261747" stroke-width="3.5" />
+              <path d="M -16,-11 A 19,19 0 0,1 11,-16" fill="none" stroke="#b899f2" stroke-width="3" stroke-linecap="round" opacity="0.85" />
+              <circle cx="0" cy="0" r="16.5" fill="url(#purple-pan-inner)" stroke="#261747" stroke-width="2.5" />
+              <path d="M -9,-9 C -3,-13 6,-11 9,-6 C 14,-4 15,3 10,6 C 11,11 5,13 -1,11 C -7,12 -12,8 -11,1 C -13,-4 -12,-7 -9,-9 Z"
+                    fill="#d8cff0" transform="translate(1.5, 2)" />
+              <path d="M -9,-9 C -3,-13 6,-11 9,-6 C 14,-4 15,3 10,6 C 11,11 5,13 -1,11 C -7,12 -12,8 -11,1 C -13,-4 -12,-7 -9,-9 Z"
+                    fill="#ffffff" stroke="#34225c" stroke-width="2.4" stroke-linejoin="round" />
+              <circle cx="-1.5" cy="0.5" r="6.2" fill="url(#egg-yolk-core)" stroke="#9e3b00" stroke-width="1.8" />
+              <ellipse cx="-3.5" cy="-1.8" rx="2.2" ry="1.4" transform="rotate(-25 -3.5 -1.8)" fill="#ffffff" opacity="0.9" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 3 (fighter)：銅翼螺旋槳戰鬥機
+                 ========================================================= -->
+            <g id="sprite-enemy-fighter">
+              <ellipse cx="3" cy="6" rx="26" ry="16" fill="rgba(20, 14, 44, 0.32)" />
+              <rect x="-26" y="-6" width="52" height="13" rx="6.5" fill="url(#enemy-teal-grad)" stroke="#2b193d" stroke-width="3.2" />
+              <path d="M -21,-3 L 18,-3" stroke="#d8f3dc" stroke-width="2.5" stroke-linecap="round" opacity="0.75" />
+              <ellipse cx="0" cy="0" rx="12" ry="20" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <ellipse cx="-14" cy="18" rx="9" ry="2.2" fill="#ffffff" opacity="0.7" />
+              <ellipse cx="14" cy="18" rx="9" ry="2.2" fill="#ffffff" opacity="0.7" />
+              <circle cx="0" cy="20" r="5" fill="#ff5d8f" stroke="#2b193d" stroke-width="2.8" />
+              <circle cx="0" cy="-2" r="7.5" fill="url(#canopy-glass)" stroke="#2b193d" stroke-width="2.8" />
+              <circle cx="-2.2" cy="-4.2" r="2.2" fill="#ffffff" opacity="0.85" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 4 (carrier)：鐵甲鯨大型運輸飛艇 (掉維修扳手)
+                 ========================================================= -->
+            <g id="sprite-enemy-carrier">
+              <ellipse cx="4" cy="8" rx="44" ry="34" fill="rgba(20, 14, 44, 0.35)" />
+              <rect x="-44" y="-18" width="16" height="36" rx="8" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <rect x="28" y="-18" width="16" height="36" rx="8" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <rect x="-30" y="-34" width="60" height="68" rx="28" fill="url(#enemy-red-grad)" stroke="#2b193d" stroke-width="4" />
+              <path d="M -20,-24 C -24,-10 -24,10 -20,22" fill="none" stroke="#ffc2d1" stroke-width="4" stroke-linecap="round" opacity="0.7" />
+              <circle cx="0" cy="-8" r="15" fill="url(#cream-body)" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M -7,-8 L 7,-8 M 0,-15 L 0,-1" stroke="#57cc99" stroke-width="5" stroke-linecap="round" />
+              <circle cx="0" cy="16" r="10" fill="url(#purple-pan-rim)" stroke="#2b193d" stroke-width="3" />
+              <circle cx="-2.5" cy="13.5" r="3" fill="#ffffff" opacity="0.8" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 5 (ladybug)：發條瓢蟲自走機 (高速S型俯衝群)
+                 ========================================================= -->
+            <g id="sprite-enemy-ladybug">
+              <circle cx="3" cy="5" r="19" fill="rgba(20, 14, 44, 0.32)" />
+              <!-- 黃銅發條鑰匙 -->
+              <rect x="-8" y="-23" width="16" height="7" rx="3.5" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="2.5" />
+              <!-- 圓潤甲殼 -->
+              <circle cx="0" cy="0" r="18" fill="url(#enemy-red-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M 0,-17 L 0,17" stroke="#2b193d" stroke-width="3" />
+              <!-- 圓點裝飾與高光 -->
+              <circle cx="-7" cy="-5" r="3.5" fill="#2b193d" />
+              <circle cx="7" cy="-5" r="3.5" fill="#2b193d" />
+              <circle cx="-6" cy="6" r="3" fill="#2b193d" />
+              <circle cx="6" cy="6" r="3" fill="#2b193d" />
+              <path d="M -13,-8 A 14,14 0 0,1 -3,-14" fill="none" stroke="#ffc2d1" stroke-width="3" stroke-linecap="round" />
+              <!-- 藍寶石雙眼 -->
+              <circle cx="-5" cy="15" r="3.5" fill="#48cae4" stroke="#2b193d" stroke-width="2" />
+              <circle cx="5" cy="15" r="3.5" fill="#48cae4" stroke="#2b193d" stroke-width="2" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 6 (saw)：齒輪旋刃攔截機 (十字彈幕與俯衝切割)
+                 ========================================================= -->
+            <g id="sprite-enemy-saw">
+              <circle cx="3" cy="6" r="24" fill="rgba(20, 14, 44, 0.32)" />
+              <!-- 十字齒輪外爪 -->
+              <rect x="-25" y="-7" width="50" height="14" rx="5" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.2" />
+              <rect x="-7" y="-25" width="14" height="50" rx="5" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.2" />
+              <rect x="-25" y="-7" width="50" height="14" rx="5" transform="rotate(45)" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.2" />
+              <rect x="-7" y="-25" width="14" height="50" rx="5" transform="rotate(45)" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.2" />
+              <circle cx="0" cy="0" r="17" fill="url(#purple-pan-rim)" stroke="#2b193d" stroke-width="3.5" />
+              <circle cx="0" cy="0" r="9" fill="url(#egg-yolk-core)" stroke="#2b193d" stroke-width="2.5" />
+              <circle cx="-2.5" cy="-2.5" r="2.8" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 7 (balloon_bomber)：雙聯裝熱氣球轟炸機 (投擲分裂開花彈)
+                 ========================================================= -->
+            <g id="sprite-enemy-bomber">
+              <ellipse cx="4" cy="7" rx="32" ry="22" fill="rgba(20, 14, 44, 0.35)" />
+              <!-- 左右雙熱氣球浮筒 -->
+              <ellipse cx="-18" cy="0" rx="14" ry="24" fill="url(#enemy-orange-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <ellipse cx="18" cy="0" rx="14" ry="24" fill="url(#enemy-orange-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M -23,-14 C -26,-5 -26,5 -23,14" fill="none" stroke="#fff3b0" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+              <path d="M 13,-14 C 10,-5 10,5 13,14" fill="none" stroke="#fff3b0" stroke-width="3" stroke-linecap="round" opacity="0.8" />
+              <!-- 中央炸彈吊艙 -->
+              <rect x="-12" y="-12" width="24" height="24" rx="8" fill="url(#purple-pan-rim)" stroke="#2b193d" stroke-width="3.5" />
+              <circle cx="0" cy="0" r="7" fill="url(#enemy-red-grad)" stroke="#2b193d" stroke-width="2.5" />
+              <circle cx="-2" cy="-2" r="2.2" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 8 (prism)：星芒稜鏡浮游砲 (發射高速精準光束彈)
+                 ========================================================= -->
+            <g id="sprite-enemy-prism">
+              <polygon points="0,-24 24,0 0,24 -24,0" transform="translate(3, 6)" fill="rgba(20, 14, 44, 0.32)" />
+              <polygon points="0,-24 24,0 0,24 -24,0" fill="url(#enemy-cyan-grad)" stroke="#2b193d" stroke-width="3.5" stroke-linejoin="round" />
+              <polygon points="-20,-14 14,-20 20,14 -14,20" fill="url(#purple-pan-rim)" stroke="#2b193d" stroke-width="3" stroke-linejoin="round" />
+              <circle cx="0" cy="0" r="10" fill="url(#canopy-glass)" stroke="#2b193d" stroke-width="2.8" />
+              <circle cx="-3" cy="-3" r="3" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 9 (gunship)：雙頭蒸汽重砲艇 (左右雙砲管齊射)
+                 ========================================================= -->
+            <g id="sprite-enemy-gunship">
+              <ellipse cx="4" cy="7" rx="36" ry="25" fill="rgba(20, 14, 44, 0.35)" />
+              <!-- 寬厚雙翼 -->
+              <rect x="-36" y="-12" width="72" height="24" rx="11" fill="url(#enemy-teal-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <!-- 左右重型黃銅砲管 -->
+              <rect x="-24" y="6" width="11" height="20" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <rect x="13" y="6" width="11" height="20" rx="4" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3" />
+              <!-- 中央圓頂裝甲艙 -->
+              <ellipse cx="0" cy="-2" rx="18" ry="22" fill="url(#purple-pan-rim)" stroke="#2b193d" stroke-width="3.5" />
+              <circle cx="0" cy="-2" r="9.5" fill="url(#egg-yolk-core)" stroke="#2b193d" stroke-width="2.8" />
+              <ellipse cx="-3" cy="-5" rx="3.5" ry="2" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 10 (shield_guard)：重盾遺跡守衛機 (前部高能弧形護盾)
+                 ========================================================= -->
+            <g id="sprite-enemy-shield">
+              <ellipse cx="3" cy="7" rx="28" ry="24" fill="rgba(20, 14, 44, 0.35)" />
+              <!-- 機體本體 -->
+              <circle cx="0" cy="-4" r="19" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <circle cx="0" cy="-4" r="10" fill="url(#purple-pan-inner)" stroke="#2b193d" stroke-width="2.5" />
+              <circle cx="0" cy="-4" r="5.5" fill="#ff4d6d" />
+              <!-- 前方厚實半月能量重盾 -->
+              <path d="M -27,6 C -20,25 20,25 27,6 L 21,0 C 14,14 -14,14 -21,0 Z"
+                    fill="url(#enemy-cyan-grad)" stroke="#2b193d" stroke-width="3.5" stroke-linejoin="round" />
+              <path d="M -18,9 C -8,18 8,18 18,9" fill="none" stroke="#ffffff" stroke-width="2.8" stroke-linecap="round" opacity="0.85" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 11 (mine_layer)：雲海布雷飛魚 (释放八向感應浮游雷)
+                 ========================================================= -->
+            <g id="sprite-enemy-minelayer">
+              <path d="M 0,24 L -30,-6 L 0,-22 L 30,-6 Z" transform="translate(3, 6)" fill="rgba(20, 14, 44, 0.32)" />
+              <path d="M 0,24 C -14,18 -32,2 -30,-8 C -28,-16 -12,-22 0,-22 C 12,-22 28,-16 30,-8 C 32,2 14,18 0,24 Z"
+                    fill="url(#enemy-orange-grad)" stroke="#2b193d" stroke-width="3.5" stroke-linejoin="round" />
+              <circle cx="0" cy="-2" r="9" fill="url(#canopy-glass)" stroke="#2b193d" stroke-width="2.8" />
+              <circle cx="-2.5" cy="-4.5" r="2.5" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 敵機 12 (mini_boss)：中繼精英艦「鋼鐵風車巡洋艦」
+                 ========================================================= -->
+            <g id="sprite-enemy-miniboss">
+              <ellipse cx="5" cy="9" rx="74" ry="36" fill="rgba(20, 14, 44, 0.38)" />
+              <rect x="-72" y="-18" width="144" height="36" rx="18" fill="url(#enemy-teal-grad)" stroke="#24153d" stroke-width="4" />
+              <ellipse cx="0" cy="0" rx="42" ry="32" fill="url(#brass-grad)" stroke="#24153d" stroke-width="4" />
+              <circle cx="-46" cy="14" r="11" fill="url(#enemy-red-grad)" stroke="#24153d" stroke-width="3" />
+              <circle cx="46" cy="14" r="11" fill="url(#enemy-red-grad)" stroke="#24153d" stroke-width="3" />
+              <circle cx="0" cy="0" r="18" fill="url(#purple-pan-inner)" stroke="#24153d" stroke-width="3.2" />
+              <circle cx="0" cy="0" r="10" fill="url(#canopy-glass)" />
+              <ellipse cx="-3" cy="-3" rx="3.5" ry="2" fill="#ffffff" />
+            </g>
+
+            <!-- =========================================================
+                 三色彈跳核心水晶圖示 (紅 / 藍 / 黃) 與 維修扳手
+                 ========================================================= -->
+            <g id="icon-crystal-red">
+              <circle cx="42" cy="44" r="26" fill="rgba(20, 14, 44, 0.32)" />
+              <circle cx="40" cy="40" r="26" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="4" />
+              <circle cx="40" cy="40" r="20" fill="#2c193d" />
+              <polygon points="40,18 56,34 50,58 30,58 24,34" fill="url(#crystal-red-grad)" stroke="#2b193d" stroke-width="3.2" stroke-linejoin="round" />
+              <polygon points="40,22 49,33 40,42 31,33" fill="#ffd6e0" opacity="0.75" />
+              <circle cx="34" cy="30" r="3.5" fill="#ffffff" />
+            </g>
+
+            <g id="icon-crystal-blue">
+              <circle cx="42" cy="44" r="26" fill="rgba(20, 14, 44, 0.32)" />
+              <circle cx="40" cy="40" r="26" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="4" />
+              <circle cx="40" cy="40" r="20" fill="#13293d" />
+              <polygon points="40,18 56,34 50,58 30,58 24,34" fill="url(#crystal-blue-grad)" stroke="#2b193d" stroke-width="3.2" stroke-linejoin="round" />
+              <polygon points="40,22 49,33 40,42 31,33" fill="#caf0f8" opacity="0.75" />
+              <circle cx="34" cy="30" r="3.5" fill="#ffffff" />
+            </g>
+
+            <g id="icon-crystal-yellow">
+              <circle cx="42" cy="44" r="26" fill="rgba(20, 14, 44, 0.32)" />
+              <circle cx="40" cy="40" r="26" fill="url(#brass-grad)" stroke="#2b193d" stroke-width="4" />
+              <circle cx="40" cy="40" r="20" fill="#3b2610" />
+              <polygon points="40,18 56,34 50,58 30,58 24,34" fill="url(#crystal-yellow-grad)" stroke="#2b193d" stroke-width="3.2" stroke-linejoin="round" />
+              <polygon points="40,22 49,33 40,42 31,33" fill="#fff3b0" opacity="0.8" />
+              <circle cx="34" cy="30" r="3.5" fill="#ffffff" />
+            </g>
+
+            <g id="icon-wrench">
+              <circle cx="2" cy="4" r="20" fill="rgba(20, 14, 44, 0.32)" />
+              <circle cx="0" cy="0" r="20" fill="url(#enemy-teal-grad)" stroke="#2b193d" stroke-width="3.5" />
+              <path d="M -12,-9 A 15,15 0 0,1 9,-12" fill="none" stroke="#d8f3dc" stroke-width="2.8" stroke-linecap="round" />
+              <g transform="rotate(-35)">
+                <rect x="-4" y="-9" width="8" height="18" rx="3" fill="url(#cream-body)" stroke="#2b193d" stroke-width="2.6" />
+                <circle cx="0" cy="-10" r="6.5" fill="url(#cream-body)" stroke="#2b193d" stroke-width="2.6" />
+                <circle cx="0" cy="-11.5" r="2.8" fill="#2b193d" />
+                <circle cx="0" cy="10" r="5.5" fill="url(#cream-body)" stroke="#2b193d" stroke-width="2.6" />
+              </g>
+            </g>
+
+            <!-- =========================================================
+                 第一關守關 Boss：「碧空巨像・風車要塞號 (Aeolus Fortress)」(5倍血量)
+                 ========================================================= -->
+            <g id="sprite-boss-stage1">
+              <ellipse cx="6" cy="12" rx="138" ry="52" fill="rgba(20, 14, 44, 0.38)" />
+              <rect x="-135" y="-26" width="270" height="54" rx="26" fill="url(#purple-pan-rim)" stroke="#24153d" stroke-width="4.5" />
+              <path d="M -120,-18 L 120,-18" stroke="#b899f2" stroke-width="4" stroke-linecap="round" opacity="0.65" />
+              <ellipse cx="0" cy="0" rx="68" ry="52" fill="url(#enemy-red-grad)" stroke="#24153d" stroke-width="4.5" />
+              <path d="M -52,-20 A 58,42 0 0,1 25,-42" fill="none" stroke="#ffc2d1" stroke-width="4.5" stroke-linecap="round" opacity="0.7" />
+              <circle cx="0" cy="4" r="34" fill="url(#brass-grad)" stroke="#24153d" stroke-width="4" />
+              <circle cx="0" cy="4" r="24" fill="url(#purple-pan-inner)" stroke="#24153d" stroke-width="3" />
+              <circle cx="0" cy="4" r="15" fill="url(#egg-yolk-core)" stroke="#9e3b00" stroke-width="2.5" />
+              <ellipse cx="-5" cy="-1" rx="5" ry="3" transform="rotate(-25 -5 -1)" fill="#ffffff" opacity="0.9" />
+            </g>
+          </defs>
+
+          <!-- 1. 天空底層 -->
+          <rect x="0" y="0" width="600" height="800" fill="url(#sky-grad)" />
+
+          <!-- 2. 遠景雲海與漂浮木造風車島嶼層 -->
+          <g id="layer-bg-clouds"></g>
+          <g id="layer-islands"></g>
+
+          <!-- 3. 地面/低空特效與燃燒區域層 -->
+          <g id="layer-zones"></g>
+
+          <!-- 4. 掉落水晶與維修扳手層 -->
+          <g id="layer-items"></g>
+
+          <!-- 5. 敵機與 Boss 層 -->
+          <g id="layer-enemies"></g>
+
+          <!-- 6. 玩家子彈與雷射光束層 -->
+          <g id="layer-player-bullets"></g>
+
+          <!-- 7. 玩家機體與護盾層 -->
+          <g id="layer-players"></g>
+
+          <!-- 8. 敵方彈幕層 -->
+          <g id="layer-enemy-bullets"></g>
+
+          <!-- 9. 爆破、彈跳文字與電磁脈衝特效層 -->
+          <g id="layer-fx"></g>
+        </svg>
+
+        <!-- =========================================================
+             覆蓋選單 1：出擊整備與開始畫面 (Loadout & Start)
+             ========================================================= -->
+        <div class="overlay-screen" id="screen-start">
+          <div class="modal-card">
+            <svg class="hero-emblem" viewBox="-50 -50 100 100">
+              <circle cx="0" cy="0" r="42" fill="url(#purple-pan-rim)" stroke="#23153c" stroke-width="4" />
+              <circle cx="0" cy="0" r="32" fill="url(#purple-pan-inner)" />
+              <use href="#sprite-player-1" transform="scale(1.05)" />
+            </svg>
+            <div class="modal-title">雲端奇兵：星辰脈衝</div>
+            <div class="modal-subtitle">第一關：碧空浮島（3倍長征・12種敵機・5倍Boss強化版）</div>
+
+            <div style="width:100%; text-align:left; font-size:12px; font-weight:800; color:#ffd166;">
+              1. 選擇出擊人數模式：
+            </div>
+            <div class="mode-switch">
+              <button class="mode-pill selected" data-mode="1" id="mode-1p">單人出擊 (1P)</button>
+              <button class="mode-pill" data-mode="2" id="mode-2p">雙人同樂 (2P Co-op 能量連結)</button>
+            </div>
+
+            <div style="width:100%; text-align:left; font-size:12px; font-weight:800; color:#ffd166;">
+              2. 選擇機體出擊前微調（星辰齒輪 Loadout）：
+            </div>
+            <div class="loadout-grid" id="loadout-selector">
+              <div class="loadout-option selected" data-perk="shield">
+                <div class="loadout-title">極速充能核心</div>
+                <div class="loadout-desc">護盾恢復延遲縮短且充能速度 +35%</div>
+              </div>
+              <div class="loadout-option" data-perk="crystal">
+                <div class="loadout-title">高彈力磁場</div>
+                <div class="loadout-desc">水晶反彈次數 +3，自動吸附範圍擴大</div>
+              </div>
+              <div class="loadout-option" data-perk="weapon">
+                <div class="loadout-title">超載武裝模組</div>
+                <div class="loadout-desc">初始武器直接 Lv.2，蓄力速度 +30%</div>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="cartoon-btn btn-secondary" id="btn-show-gallery">圖鑑預覽 (16)</button>
+              <button class="cartoon-btn btn-primary" id="btn-start-game">立即升空出擊！</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             覆蓋選單 2：SVG 遊戲元件圖鑑 (12種敵機 + 戰機 + 水晶)
+             ========================================================= -->
+        <div class="overlay-screen hidden" id="screen-gallery">
+          <div class="modal-card" style="max-width:540px;">
+            <div class="modal-title" style="font-size:21px;">SVG 遊戲圖示美術館 (16種單位)</div>
+            <div class="modal-subtitle">純 HTML + CSS + SVG 向量繪製（左上光源・圓潤立體・厚實描邊）</div>
+
+            <div class="gallery-grid">
+              <div class="gallery-item">
+                <svg viewBox="-45 -45 90 90"><use href="#sprite-player-1" /></svg>
+                <div class="gallery-name">星辰飛燕號 (1P)</div>
+                <div class="gallery-role">玩家主力戰機</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-40 -40 80 80"><use href="#sprite-enemy-pan" /></svg>
+                <div class="gallery-name">紫晶太陽圓盤機</div>
+                <div class="gallery-role">RF.jpg 致敬敵機</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-35 -35 70 70"><use href="#sprite-enemy-buoy" /></svg>
+                <div class="gallery-name">空中氣球浮標</div>
+                <div class="gallery-role">擊破掉彈跳水晶</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-40 -40 80 80"><use href="#sprite-enemy-fighter" /></svg>
+                <div class="gallery-name">銅翼螺旋槳機</div>
+                <div class="gallery-role">三連發扇形狙擊</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-35 -35 70 70"><use href="#sprite-enemy-ladybug" /></svg>
+                <div class="gallery-name">發條瓢蟲自走機</div>
+                <div class="gallery-role">S型群聚高速俯衝</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-38 -38 76 76"><use href="#sprite-enemy-saw" /></svg>
+                <div class="gallery-name">齒輪旋刃攔截機</div>
+                <div class="gallery-role">十字彈幕＆突擊</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-45 -40 90 80"><use href="#sprite-enemy-bomber" /></svg>
+                <div class="gallery-name">熱氣球轟炸機</div>
+                <div class="gallery-role">投擲6向分裂開花彈</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-36 -36 72 72"><use href="#sprite-enemy-prism" /></svg>
+                <div class="gallery-name">星芒稜鏡浮游砲</div>
+                <div class="gallery-role">高速精準菱形彈</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-48 -40 96 80"><use href="#sprite-enemy-gunship" /></svg>
+                <div class="gallery-name">雙頭蒸汽重砲艇</div>
+                <div class="gallery-role">雙砲管密集壓制</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-40 -40 80 80"><use href="#sprite-enemy-shield" /></svg>
+                <div class="gallery-name">重盾遺跡守衛機</div>
+                <div class="gallery-role">正面裝甲護盾防禦</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-42 -40 84 80"><use href="#sprite-enemy-minelayer" /></svg>
+                <div class="gallery-name">雲海布雷飛魚</div>
+                <div class="gallery-role">釋放8向爆發浮游雷</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-55 -50 110 100"><use href="#sprite-enemy-carrier" /></svg>
+                <div class="gallery-name">鐵甲鯨運輸艇</div>
+                <div class="gallery-role">擊破掉維修扳手</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-85 -50 170 100"><use href="#sprite-enemy-miniboss" /></svg>
+                <div class="gallery-name">鋼鐵風車巡洋艦</div>
+                <div class="gallery-role">關卡中繼精英艦</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-150 -70 300 140"><use href="#sprite-boss-stage1" /></svg>
+                <div class="gallery-name">風車要塞號</div>
+                <div class="gallery-role">第一關守關 Boss</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="0 0 80 80"><use href="#icon-crystal-red" /></svg>
+                <div class="gallery-name">三色彈跳水晶</div>
+                <div class="gallery-role">射擊變色＆升級</div>
+              </div>
+              <div class="gallery-item">
+                <svg viewBox="-30 -30 60 60"><use href="#icon-wrench" /></svg>
+                <div class="gallery-name">維修扳手</div>
+                <div class="gallery-role">恢復 35 點裝甲</div>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="cartoon-btn btn-primary" id="btn-close-gallery">返回遊戲</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =========================================================
+             覆蓋選單 3：第一關通關結算 / 墜機重試畫面
+             ========================================================= -->
+        <div class="overlay-screen hidden" id="screen-result">
+          <div class="modal-card">
+            <svg class="hero-emblem" viewBox="-45 -45 90 90">
+              <use href="#sprite-enemy-pan" transform="scale(1.3)" />
+            </svg>
+            <div class="modal-title" id="result-title">STAGE 1 CLEAR!</div>
+            <div class="modal-subtitle" id="result-subtitle">成功突破「碧空浮島：雲海與風車鎮」！</div>
+
+            <div class="stats-box">
+              <div class="stat-line">
+                <span>最終戰役得分</span>
+                <span style="color:#ffd166;" id="stat-score">0</span>
+              </div>
+              <div class="stat-line">
+                <span>最高武器進化等級</span>
+                <span style="color:#72efdd;" id="stat-max-level">Lv.1</span>
+              </div>
+              <div class="stat-line">
+                <span>水晶射擊變色次數</span>
+                <span style="color:#ff8fa3;" id="stat-crystal-bounces">0 次</span>
+              </div>
+              <div class="stat-line">
+                <span>獲得星辰齒輪獎勵</span>
+                <span style="color:#57cc99;" id="stat-gears">+5 枚</span>
+              </div>
+            </div>
+
+            <div class="btn-row">
+              <button class="cartoon-btn btn-secondary" id="btn-back-loadout">更換整備</button>
+              <button class="cartoon-btn btn-primary" id="btn-replay">再次挑戰第一關</button>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      "use strict";
+
+      const SVG_NS = "http://www.w3.org/2000/svg";
+      const STAGE_W = 600;
+      const STAGE_H = 800;
+      const BOSS_SPAWN_TIME = 135.0; // 關卡長度為原本 45 秒的 3 倍 (135 秒長征後進入 Boss 決戰)
+
+      // =========================================================================
+      // 安全防當機 Web Audio API 音效與背景音樂合成器 (含《兵蜂》風明快冒險 BGM 與 Boss 戰 BGM)
+      // =========================================================================
+      class SoundEngine {
+        constructor() {
+          this.ctx = null;
+          this.muted = false;
+          this.activeNodes = 0;
+          this.lastPlayed = {};
+          this.bgmStep = 0;
+          this.bgmTimer = 0;
+          this.bgmMode = "stage"; // 'stage' | 'boss'
+
+          // 音名轉頻率對照表
+          this.noteFreq = {
+            _: 0,
+            A2: 110.0, B2: 123.47, C3: 130.81, D3: 146.83, E3: 164.81, F3: 174.61, G3: 196.0, A3: 220.0, B3: 246.94,
+            C4: 261.63, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392.0, G4s: 415.3, A4: 440.0, B4: 493.88,
+            C5: 523.25, D5: 587.33, E5: 659.25, F5: 698.46, G5: 783.99, G5s: 830.61, A5: 880.0, B5: 987.77, C6: 1046.5,
+          };
+
+          // 第一關背景音樂：「碧空浮島・風車進行曲」(明快手繪賽璐璐 × 輕蒸汽龐克冒險曲，64 步循環)
+          this.stageMelody = [
+            // A 段：藍天啟航 (C -> Am -> F -> G)
+            "C5", "E5", "G5", "_",  "A5", "G5", "E5", "C5",
+            "A4", "C5", "E5", "A5", "G5", "_",  "E5", "_",
+            "F5", "E5", "D5", "C5", "D5", "E5", "F5", "A5",
+            "G5", "_",  "D5", "E5", "F5", "G5", "A5", "B5",
+            // B 段：雲海風車鎮 (C -> Em -> F -> G -> C)
+            "C6", "_",  "B5", "G5", "A5", "G5", "E5", "C5",
+            "B4", "D5", "G5", "B5", "A5", "_",  "G5", "_",
+            "F5", "A5", "G5", "E5", "D5", "F5", "E5", "C5",
+            "D5", "E5", "F5", "D5", "C5", "_",  "G4", "_",
+          ];
+          this.stageHarmony = [
+            "E4", "_",  "C5", "_",  "C5", "_",  "G4", "_",
+            "C4", "_",  "A4", "_",  "E4", "_",  "C4", "_",
+            "A4", "_",  "F4", "_",  "A4", "_",  "C5", "_",
+            "B4", "_",  "G4", "_",  "B4", "_",  "D5", "_",
+            "E5", "_",  "D5", "_",  "C5", "_",  "G4", "_",
+            "G4", "_",  "B4", "_",  "C5", "_",  "E4", "_",
+            "A4", "_",  "C5", "_",  "F4", "_",  "G4", "_",
+            "B4", "_",  "G4", "_",  "E4", "_",  "E4", "_",
+          ];
+          this.stageBass = [
+            "C3", "G3", "C3", "G3", "C3", "G3", "C3", "G3",
+            "A2", "E3", "A2", "E3", "A2", "E3", "A2", "E3",
+            "F3", "C4", "F3", "C4", "D3", "A3", "D3", "A3",
+            "G3", "D4", "G3", "D4", "G3", "F3", "E3", "D3",
+            "C3", "G3", "C3", "G3", "C3", "G3", "C3", "G3",
+            "E3", "B3", "E3", "B3", "A2", "E3", "A2", "E3",
+            "F3", "C4", "E3", "C4", "D3", "A3", "C3", "G3",
+            "G3", "D4", "G3", "B3", "C3", "G3", "C3", "_",
+          ];
+
+          // Boss 決戰背景音樂：「碧空巨像・風車要塞決戰」(緊湊熱血 A 小調，32 步循環)
+          this.bossMelody = [
+            "A4", "C5", "E5", "A5", "G5", "E5", "F5", "D5",
+            "E5", "_",  "E5", "F5", "E5", "D5", "C5", "B4",
+            "A4", "C5", "E5", "A5", "B5", "A5", "G5s", "E5",
+            "A5", "_",  "G5", "F5", "E5", "D5", "C5", "B4",
+          ];
+          this.bossBass = [
+            "A2", "A3", "A2", "A3", "G3", "G3", "F3", "F3",
+            "E3", "E3", "E3", "E3", "E3", "D3", "C3", "B2",
+            "A2", "A3", "A2", "A3", "B2", "B3", "E3", "E3",
+            "A2", "A3", "G3", "F3", "E3", "D3", "C3", "B2",
+          ];
+        }
+        init() {
+          try {
+            if (!this.ctx) {
+              const AudioCtx = window.AudioContext || window.webkitAudioContext;
+              if (AudioCtx) this.ctx = new AudioCtx();
+            }
+            if (this.ctx && this.ctx.state === "suspended") {
+              this.ctx.resume();
+            }
+          } catch (_) {}
+        }
+        resetBgm() {
+          this.bgmStep = 0;
+          this.bgmTimer = 0;
+          this.bgmMode = "stage";
+        }
+        playBgmNote(freq, type, duration, vol = 0.04, slideTo = null) {
+          if (this.muted || !this.ctx || !freq || this.activeNodes >= 22) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(Math.max(20, freq), now);
+            if (slideTo) {
+              osc.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), now + duration);
+            }
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.0008, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            this.activeNodes += 1;
+            osc.onended = () => {
+              this.activeNodes = Math.max(0, this.activeNodes - 1);
+              try {
+                osc.disconnect();
+                gain.disconnect();
+              } catch (_) {}
+            };
+            osc.start(now);
+            osc.stop(now + duration);
+          } catch (_) {}
+        }
+        updateBgm(dt, isBossActive) {
+          if (this.muted || !this.ctx) return;
+          const targetMode = isBossActive ? "boss" : "stage";
+          if (this.bgmMode !== targetMode) {
+            this.bgmMode = targetMode;
+            this.bgmStep = 0;
+            this.bgmTimer = 0;
+          }
+
+          const stepDuration = this.bgmMode === "boss" ? 0.115 : 0.135;
+          this.bgmTimer -= dt;
+          if (this.bgmTimer > 0) return;
+          this.bgmTimer += stepDuration;
+
+          if (this.bgmMode === "stage") {
+            const idx = this.bgmStep % this.stageMelody.length;
+            const mNote = this.noteFreq[this.stageMelody[idx]];
+            const hNote = this.noteFreq[this.stageHarmony[idx]];
+            const bNote = this.noteFreq[this.stageBass[idx]];
+
+            if (mNote) this.playBgmNote(mNote, "square", stepDuration * 0.88, 0.036);
+            if (hNote) this.playBgmNote(hNote, "triangle", stepDuration * 0.9, 0.028);
+            if (bNote) this.playBgmNote(bNote, "triangle", stepDuration * 0.82, 0.048);
+
+            // 輕快進行曲鼓點 (每 4 步大鼓、偶數步輕拍)
+            if (idx % 4 === 0) {
+              this.playBgmNote(115, "sine", 0.07, 0.055, 38);
+            } else if (idx % 2 === 1) {
+              this.playBgmNote(1200, "triangle", 0.025, 0.014, 420);
+            }
+          } else {
+            const idx = this.bgmStep % this.bossMelody.length;
+            const mNote = this.noteFreq[this.bossMelody[idx]];
+            const bNote = this.noteFreq[this.bossBass[idx]];
+
+            if (mNote) this.playBgmNote(mNote, "sawtooth", stepDuration * 0.85, 0.038);
+            if (bNote) this.playBgmNote(bNote, "square", stepDuration * 0.8, 0.045);
+
+            if (idx % 2 === 0) {
+              this.playBgmNote(130, "sine", 0.065, 0.06, 36);
+            } else {
+              this.playBgmNote(980, "sawtooth", 0.03, 0.018, 280);
+            }
+          }
+
+          this.bgmStep += 1;
+        }
+        canPlay(tag, minGapMs = 45) {
+          if (this.muted || !this.ctx || this.activeNodes >= 22) return false;
+          const now = performance.now();
+          if (this.lastPlayed[tag] && now - this.lastPlayed[tag] < minGapMs) return false;
+          this.lastPlayed[tag] = now;
+          return true;
+        }
+        tone(tag, freq, type, duration, vol = 0.1, slideTo = null, minGapMs = 45) {
+          if (!this.canPlay(tag, minGapMs)) return;
+          try {
+            const now = this.ctx.currentTime;
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(Math.max(20, freq), now);
+            if (slideTo) {
+              osc.frequency.exponentialRampToValueAtTime(Math.max(20, slideTo), now + duration);
+            }
+            gain.gain.setValueAtTime(vol, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            this.activeNodes += 1;
+            osc.onended = () => {
+              this.activeNodes = Math.max(0, this.activeNodes - 1);
+              try {
+                osc.disconnect();
+                gain.disconnect();
+              } catch (_) {}
+            };
+            osc.start(now);
+            osc.stop(now + duration);
+          } catch (_) {}
+        }
+        shoot(weaponType) {
+          if (weaponType === "red") this.tone("shoot", 540, "triangle", 0.055, 0.06, 220, 55);
+          else if (weaponType === "blue") this.tone("shoot", 880, "sine", 0.05, 0.05, 620, 55);
+          else this.tone("shoot", 680, "square", 0.055, 0.045, 340, 55);
+        }
+        crystalPing(colorIdx) {
+          const notes = [880, 1046.5, 1318.5];
+          const base = notes[colorIdx % 3];
+          this.tone("ping", base, "sine", 0.13, 0.12, base * 1.25, 40);
+        }
+        powerUp() {
+          this.tone("power", 587.33, "triangle", 0.16, 0.14, 1046.5, 80);
+        }
+        chargeRelease() {
+          this.tone("charge", 240, "sawtooth", 0.38, 0.15, 920, 120);
+        }
+        empBomb() {
+          this.tone("emp", 180, "sawtooth", 0.55, 0.2, 45, 200);
+        }
+        explode(big = false) {
+          this.tone(
+            big ? "expBig" : "expSmall",
+            big ? 95 : 160,
+            "sawtooth",
+            big ? 0.38 : 0.15,
+            big ? 0.18 : 0.1,
+            28,
+            big ? 90 : 50
+          );
+        }
+        shieldHit() {
+          this.tone("shield", 360, "square", 0.16, 0.14, 140, 80);
+        }
+      }
+
+      const sfx = new SoundEngine();
+
+      function createSVG(tag, attrs = {}) {
+        const el = document.createElementNS(SVG_NS, tag);
+        for (const [k, v] of Object.entries(attrs)) {
+          el.setAttribute(k, v);
+        }
+        return el;
+      }
+
+      const layers = {
+        clouds: document.getElementById("layer-bg-clouds"),
+        islands: document.getElementById("layer-islands"),
+        zones: document.getElementById("layer-zones"),
+        items: document.getElementById("layer-items"),
+        enemies: document.getElementById("layer-enemies"),
+        playerBullets: document.getElementById("layer-player-bullets"),
+        players: document.getElementById("layer-players"),
+        enemyBullets: document.getElementById("layer-enemy-bullets"),
+        fx: document.getElementById("layer-fx"),
+      };
+
+      const hud = {
+        shieldFill: document.getElementById("shield-fill"),
+        shieldText: document.getElementById("shield-text"),
+        hpFill: document.getElementById("hp-fill"),
+        hpText: document.getElementById("hp-text"),
+        chargeFill: document.getElementById("charge-fill"),
+        chargeText: document.getElementById("charge-text"),
+        progressFill: document.getElementById("progress-fill"),
+        progressText: document.getElementById("progress-text"),
+        score: document.getElementById("score-display"),
+        weaponTag: document.getElementById("weapon-hud-tag"),
+        bombCount: document.getElementById("bomb-count"),
+        bossHud: document.getElementById("boss-hud"),
+        bossName: document.getElementById("boss-name-label"),
+        bossHpFill: document.getElementById("boss-hp-fill"),
+        bossHpPercent: document.getElementById("boss-hp-percent"),
+        toast: document.getElementById("toast-banner"),
+        badges: {
+          red: document.getElementById("badge-red"),
+          blue: document.getElementById("badge-blue"),
+          yellow: document.getElementById("badge-yellow"),
+        },
+      };
+
+      let selectedMode = 1;
+      let selectedPerk = "shield";
+      let nextEntityId = 1;
+
+      const keys = {};
+      window.addEventListener("keydown", (e) => {
+        keys[e.code] = true;
+        if (["Space", "ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight"].includes(e.code)) {
+          e.preventDefault();
+        }
+        if (e.code === "KeyP" && game.running) {
+          togglePause();
+        }
+      });
+      window.addEventListener("keyup", (e) => {
+        keys[e.code] = false;
+      });
+
+      function showToast(msg) {
+        hud.toast.textContent = msg;
+      }
+
+      const WEAPON_NAMES = {
+        red: "火神連射砲",
+        blue: "電漿聚焦雷射",
+        yellow: "蜂巢追蹤飛彈",
+      };
+      const CRYSTAL_ORDER = ["red", "blue", "yellow"];
+
+      const game = {
+        running: false,
+        paused: false,
+        time: 0,
+        score: 0,
+        bombs: 3,
+        maxWeaponLevelReached: 1,
+        crystalBounceCount: 0,
+        players: [],
+        playerBullets: [],
+        enemies: [],
+        enemyBullets: [],
+        items: [],
+        zones: [],
+        fxList: [],
+        clouds: [],
+        islands: [],
+        boss: null,
+        bossDyingTimer: 0,
+        waveIndex: 0,
+        coopBeamEl: null,
+      };
+
+      // =========================================================================
+      // 背景：雲海與漂浮木造風車島嶼 (無高耗能 Gaussian 濾鏡，純向量立體陰影)
+      // =========================================================================
+      function createCloudSVG(scale) {
+        const g = createSVG("g", { opacity: "0.75" });
+        const shadow = createSVG("path", {
+          d: "M -45,10 C -58,10 -65,-2 -54,-12 C -50,-28 -28,-34 -12,-24 C 2,-36 28,-32 36,-16 C 52,-14 58,4 44,12 Z",
+          fill: "#bde0fe",
+          transform: `translate(4, 7) scale(${scale})`,
+        });
+        const body = createSVG("path", {
+          d: "M -45,10 C -58,10 -65,-2 -54,-12 C -50,-28 -28,-34 -12,-24 C 2,-36 28,-32 36,-16 C 52,-14 58,4 44,12 Z",
+          fill: "#ffffff",
+          stroke: "#457b9d",
+          "stroke-width": "2.5",
+          transform: `scale(${scale})`,
+        });
+        g.appendChild(shadow);
+        g.appendChild(body);
+        return g;
+      }
+
+      function createWindmillIslandSVG(scale) {
+        const root = createSVG("g");
+        const inner = createSVG("g", { transform: `scale(${scale})` });
+
+        const dropShadow = createSVG("ellipse", {
+          cx: "6",
+          cy: "18",
+          rx: "56",
+          ry: "28",
+          fill: "rgba(20, 14, 44, 0.28)",
+        });
+        const rock = createSVG("path", {
+          d: "M -52,0 L 52,0 L 34,36 L 0,52 L -34,36 Z",
+          fill: "url(#island-rock)",
+          stroke: "#2b193d",
+          "stroke-width": "3.5",
+          "stroke-linejoin": "round",
+        });
+        const grass = createSVG("ellipse", {
+          cx: "0",
+          cy: "0",
+          rx: "56",
+          ry: "24",
+          fill: "url(#island-grass)",
+          stroke: "#2b193d",
+          "stroke-width": "3.5",
+        });
+        const tower = createSVG("path", {
+          d: "M -12,2 L -8,-28 L 8,-28 L 12,2 Z",
+          fill: "url(#cream-body)",
+          stroke: "#2b193d",
+          "stroke-width": "3",
+          "stroke-linejoin": "round",
+        });
+        const roof = createSVG("path", {
+          d: "M -15,-26 L 0,-42 L 15,-26 Z",
+          fill: "url(#enemy-red-grad)",
+          stroke: "#2b193d",
+          "stroke-width": "3",
+          "stroke-linejoin": "round",
+        });
+        const blades = createSVG("g", { transform: "translate(0, -24)" });
+        for (let i = 0; i < 4; i++) {
+          blades.appendChild(
+            createSVG("rect", {
+              x: "-3.5",
+              y: "-26",
+              width: "7",
+              height: "22",
+              rx: "3",
+              fill: "url(#brass-grad)",
+              stroke: "#2b193d",
+              "stroke-width": "2.4",
+              transform: `rotate(${i * 90})`,
+            })
+          );
+        }
+        blades.appendChild(
+          createSVG("circle", {
+            cx: "0",
+            cy: "0",
+            r: "5",
+            fill: "#ff5d8f",
+            stroke: "#2b193d",
+            "stroke-width": "2.4",
+          })
+        );
+
+        inner.appendChild(dropShadow);
+        inner.appendChild(rock);
+        inner.appendChild(grass);
+        inner.appendChild(tower);
+        inner.appendChild(roof);
+        inner.appendChild(blades);
+        root.appendChild(inner);
+        return { root, blades };
+      }
+
+      function initScenery() {
+        layers.clouds.innerHTML = "";
+        layers.islands.innerHTML = "";
+        game.clouds = [];
+        game.islands = [];
+
+        for (let i = 0; i < 8; i++) {
+          const scale = 0.65 + Math.random() * 0.7;
+          const el = createCloudSVG(scale);
+          layers.clouds.appendChild(el);
+          game.clouds.push({
+            x: Math.random() * STAGE_W,
+            y: Math.random() * STAGE_H,
+            vy: 42 + scale * 32,
+            el,
+          });
+        }
+
+        for (let i = 0; i < 3; i++) {
+          const scale = 0.72 + Math.random() * 0.35;
+          const { root, blades } = createWindmillIslandSVG(scale);
+          layers.islands.appendChild(root);
+          game.islands.push({
+            x: 90 + (i * 210) % 440,
+            y: i * 280 - 100,
+            vy: 54 * scale,
+            angle: Math.random() * 360,
+            scale,
+            el: root,
+            bladesEl: blades,
+          });
+        }
+      }
+
+      function updateScenery(dt) {
+        for (const c of game.clouds) {
+          c.y += c.vy * dt;
+          if (c.y > STAGE_H + 80) {
+            c.y = -80;
+            c.x = 40 + Math.random() * (STAGE_W - 80);
+          }
+          c.el.setAttribute("transform", `translate(${c.x.toFixed(1)}, ${c.y.toFixed(1)})`);
+        }
+        for (const isl of game.islands) {
+          isl.y += isl.vy * dt;
+          isl.angle = (isl.angle + 95 * dt) % 360;
+          if (isl.y > STAGE_H + 110) {
+            isl.y = -120;
+            isl.x = 80 + Math.random() * (STAGE_W - 160);
+          }
+          isl.el.setAttribute("transform", `translate(${isl.x.toFixed(1)}, ${isl.y.toFixed(1)})`);
+          isl.bladesEl.setAttribute(
+            "transform",
+            `translate(0, -24) rotate(${isl.angle.toFixed(1)})`
+          );
+        }
+      }
+
+      // =========================================================================
+      // 玩家機體與武器系統
+      // =========================================================================
+      function createPlayer(id, x, y) {
+        const g = createSVG("g");
+        const useShip = createSVG("use", {
+          href: id === 1 ? "#sprite-player-1" : "#sprite-player-2",
+        });
+
+        const shieldCircle = createSVG("circle", {
+          cx: "0",
+          cy: "-2",
+          r: "36",
+          fill: "rgba(72, 202, 228, 0.14)",
+          stroke: "#72efdd",
+          "stroke-width": "3",
+          "stroke-dasharray": "10 6",
+        });
+
+        const chargeOrb = createSVG("circle", {
+          cx: "0",
+          cy: "-34",
+          r: "4",
+          fill: "#ffd166",
+          stroke: "#ffffff",
+          "stroke-width": "2.5",
+          opacity: "0",
+        });
+
+        const megaBeam = createSVG("g", { opacity: "0" });
+        megaBeam.appendChild(
+          createSVG("rect", {
+            x: "-72",
+            y: "-800",
+            width: "144",
+            height: "775",
+            rx: "40",
+            fill: "rgba(0, 180, 216, 0.45)",
+            stroke: "#90e0ef",
+            "stroke-width": "4",
+          })
+        );
+        megaBeam.appendChild(
+          createSVG("rect", {
+            x: "-40",
+            y: "-800",
+            width: "80",
+            height: "775",
+            rx: "22",
+            fill: "#caf0f8",
+          })
+        );
+
+        g.appendChild(megaBeam);
+        g.appendChild(useShip);
+        g.appendChild(shieldCircle);
+        g.appendChild(chargeOrb);
+        layers.players.appendChild(g);
+
+        const initLevel = selectedPerk === "weapon" ? 2 : 1;
+        game.maxWeaponLevelReached = Math.max(game.maxWeaponLevelReached, initLevel);
+
+        return {
+          id,
+          x,
+          y,
+          radius: 17,
+          speed: 300,
+          shield: 100,
+          maxShield: 100,
+          hp: 100,
+          maxHp: 100,
+          timeSinceHit: 5,
+          invulnTimer: 0,
+          weaponColor: "red",
+          weaponLevel: initLevel,
+          fireCooldown: 0,
+          charge: 0,
+          wasFiring: false,
+          megaBeamTimer: 0,
+          el: g,
+          shieldEl: shieldCircle,
+          chargeOrbEl: chargeOrb,
+          megaBeamEl: megaBeam,
+        };
+      }
+
+      function isPlayerFiring(p) {
+        if (selectedMode === 1) {
+          return !!(keys["Space"] || keys["KeyZ"] || keys["KeyJ"]);
+        }
+        return p.id === 1 ? !!(keys["KeyJ"] || keys["Space"]) : !!keys["KeyZ"];
+      }
+
+      function isPlayerReleaseSpecialKey(p) {
+        if (selectedMode === 1) {
+          return !!(keys["KeyX"] || keys["KeyK"]);
+        }
+        return p.id === 1 ? !!keys["KeyK"] : !!keys["KeyX"];
+      }
+
+      function isPlayerBombPressed(p) {
+        if (selectedMode === 1) {
+          return !!(keys["KeyC"] || keys["KeyL"] || keys["ShiftLeft"] || keys["ShiftRight"]);
+        }
+        return p.id === 1 ? !!keys["KeyL"] : !!keys["KeyC"];
+      }
+
+      function getPlayerMoveVector(p) {
+        let dx = 0;
+        let dy = 0;
+        if (selectedMode === 1) {
+          if (keys["ArrowLeft"] || keys["KeyA"]) dx -= 1;
+          if (keys["ArrowRight"] || keys["KeyD"]) dx += 1;
+          if (keys["ArrowUp"] || keys["KeyW"]) dy -= 1;
+          if (keys["ArrowDown"] || keys["KeyS"]) dy += 1;
+        } else if (p.id === 1) {
+          if (keys["KeyA"]) dx -= 1;
+          if (keys["KeyD"]) dx += 1;
+          if (keys["KeyW"]) dy -= 1;
+          if (keys["KeyS"]) dy += 1;
+        } else {
+          if (keys["ArrowLeft"]) dx -= 1;
+          if (keys["ArrowRight"]) dx += 1;
+          if (keys["ArrowUp"]) dy -= 1;
+          if (keys["ArrowDown"]) dy += 1;
+        }
+        const len = Math.hypot(dx, dy);
+        if (len > 0) {
+          dx /= len;
+          dy /= len;
+        }
+        return { dx, dy };
+      }
+
+      function spawnPlayerBullet(opts) {
+        if (game.playerBullets.length > 160) return; // 安全上限防卡頓
+        const el = createSVG("g", {
+          transform: `translate(${opts.x.toFixed(1)}, ${opts.y.toFixed(1)})`,
+        });
+
+        if (opts.type === "red") {
+          el.appendChild(
+            createSVG("circle", {
+              cx: "0",
+              cy: "0",
+              r: opts.r || 6.5,
+              fill: "#ff4d6d",
+              stroke: "#ffffff",
+              "stroke-width": "2",
+            })
+          );
+        } else if (opts.type === "blue") {
+          el.appendChild(
+            createSVG("rect", {
+              x: -(opts.w || 10) / 2,
+              y: -18,
+              width: opts.w || 10,
+              height: 36,
+              rx: (opts.w || 10) / 2,
+              fill: "#48cae4",
+              stroke: "#caf0f8",
+              "stroke-width": "2.5",
+            })
+          );
+        } else if (opts.type === "yellow") {
+          el.appendChild(
+            createSVG("circle", {
+              cx: "0",
+              cy: "11",
+              r: "3.5",
+              fill: "#ffffff",
+            })
+          );
+          el.appendChild(
+            createSVG("path", {
+              d: "M 0,-11 C 5,-6 5,5 4,10 L -4,10 C -5,5 -5,-6 0,-11 Z",
+              fill: "#ffb703",
+              stroke: "#2b193d",
+              "stroke-width": "2.2",
+            })
+          );
+        } else if (opts.type === "napalm") {
+          el.appendChild(
+            createSVG("circle", {
+              cx: "0",
+              cy: "0",
+              r: "10",
+              fill: "#ff5400",
+              stroke: "#ffd166",
+              "stroke-width": "3",
+            })
+          );
+        }
+
+        layers.playerBullets.appendChild(el);
+        game.playerBullets.push({
+          x: opts.x,
+          y: opts.y,
+          vx: opts.vx || 0,
+          vy: opts.vy || -600,
+          r: opts.r || 8,
+          age: 0,
+          dmg: opts.dmg || 18,
+          type: opts.type,
+          pierce: !!opts.pierce,
+          hitEntities: opts.pierce ? new Set() : null, // 防止貫穿雷射同一幀重複命中卡死
+          cancelSmallBullets: !!opts.cancelSmallBullets,
+          homing: !!opts.homing,
+          homingFuel: opts.homing ? (opts.homingFuel || 0.55) : 0, // 有限導引時間，超時後直線飛出畫面
+          napalmTimer: opts.napalmTimer || 0,
+          el,
+        });
+      }
+
+      function firePrimaryWeapon(p) {
+        const lvl = p.weaponLevel; // 1 ~ 8 (Lv.8 = MAX)
+        sfx.shoot(p.weaponColor);
+
+        if (p.weaponColor === "red") {
+          // 紅色：火神連射砲 —— Lv.1 為 1 路，每升 1 級增加 1 路，至 Lv.8 為 8 路扇形散彈
+          const count = lvl;
+          const spreadDeg = count === 1 ? 0 : 4 + (count - 1) * 4.5;
+          for (let i = 0; i < count; i++) {
+            const ratio = count === 1 ? 0 : i / (count - 1) - 0.5;
+            const angle = ratio * ((spreadDeg * Math.PI) / 180) * 2;
+            const speed = 640;
+            spawnPlayerBullet({
+              x: p.x + ratio * (8 + count * 2.5),
+              y: p.y - 22,
+              vx: Math.sin(angle) * speed,
+              vy: -Math.cos(angle) * speed,
+              r: 6 + (lvl >= 6 ? 1.2 : 0),
+              dmg: 18 + lvl * 2.2,
+              type: "red",
+            });
+          }
+          p.fireCooldown = 0.12;
+        } else if (p.weaponColor === "blue") {
+          // 藍色：電漿聚焦雷射 —— Lv.1 為 1 道雷射，每升 1 級增加 1 道，至 Lv.8 為 8 道貫穿雷射陣列
+          const count = lvl;
+          const totalSpan = count === 1 ? 0 : 16 + (count - 1) * 11;
+          for (let i = 0; i < count; i++) {
+            const ratio = count === 1 ? 0 : i / (count - 1) - 0.5;
+            const isCenter = Math.abs(ratio) < 0.2;
+            const width = isCenter ? 10 + Math.floor(lvl * 0.8) : 7 + Math.floor(lvl * 0.4);
+            spawnPlayerBullet({
+              x: p.x + ratio * totalSpan,
+              y: p.y - 24 + Math.abs(ratio) * 12,
+              vx: 0,
+              vy: -780,
+              r: width * 0.65,
+              w: width,
+              dmg: (isCenter ? 24 : 15) + lvl * 2.5,
+              type: "blue",
+              pierce: true,
+              cancelSmallBullets: true,
+            });
+          }
+          p.fireCooldown = 0.115;
+        } else if (p.weaponColor === "yellow") {
+          // 黃色：蜂巢追蹤飛彈 —— Lv.1 為 1 枚飛彈，每升 1 級增加 1 枚，至 Lv.8 為 8 枚齊射
+          const count = lvl;
+          for (let i = 0; i < count; i++) {
+            const ratio = count === 1 ? 0 : i / (count - 1) - 0.5;
+            spawnPlayerBullet({
+              x: p.x + ratio * (12 + count * 5),
+              y: p.y - 14 + Math.abs(ratio) * 8,
+              vx: ratio * (110 + count * 18),
+              vy: -450,
+              r: 7,
+              dmg: 19 + lvl * 2.5,
+              type: "yellow",
+              homing: true,
+              homingFuel: 0.55,
+            });
+          }
+          p.fireCooldown = 0.165;
+        }
+      }
+
+      function triggerChargedAttack(p) {
+        sfx.chargeRelease();
+        p.charge = 0;
+
+        if (p.weaponColor === "red") {
+          showToast("蓄力重擊：火神【超載火網】！持續灼燒彈著區域！");
+          for (let i = 0; i < 11; i++) {
+            const ratio = i / 10 - 0.5;
+            const angle = ratio * 1.15;
+            const spd = 390 + (i % 3) * 70;
+            spawnPlayerBullet({
+              x: p.x,
+              y: p.y - 20,
+              vx: Math.sin(angle) * spd,
+              vy: -Math.cos(angle) * spd,
+              r: 10,
+              dmg: 45,
+              type: "napalm",
+              napalmTimer: 0.42 + (i % 3) * 0.12,
+            });
+          }
+        } else if (p.weaponColor === "blue") {
+          showToast("蓄力重擊：電漿【離子巨砲】！瞬間蒸發路徑敵機與彈幕！");
+          p.megaBeamTimer = 1.6;
+        } else if (p.weaponColor === "yellow") {
+          showToast("蓄力重擊：蜂巢【24枚蜂群齊射】前方廣域飽和打擊！");
+          for (let i = 0; i < 24; i++) {
+            const ratio = i / 23 - 0.5;
+            const spreadAng = ratio * 1.3; // 僅向前方扇形發射，不回頭繞圈
+            const spd = 440 + (i % 4) * 35;
+            spawnPlayerBullet({
+              x: p.x + ratio * 36,
+              y: p.y - 14,
+              vx: Math.sin(spreadAng) * spd,
+              vy: -Math.cos(spreadAng) * spd,
+              r: 8,
+              dmg: 38,
+              type: "yellow",
+              homing: true,
+              homingFuel: 0.6,
+            });
+          }
+        }
+      }
+
+      function spawnFireZone(x, y) {
+        if (game.zones.length > 18) return;
+        const el = createSVG("circle", {
+          cx: x.toFixed(1),
+          cy: y.toFixed(1),
+          r: "48",
+          fill: "rgba(255, 107, 0, 0.36)",
+          stroke: "#ffd166",
+          "stroke-width": "3",
+          "stroke-dasharray": "8 6",
+        });
+        layers.zones.appendChild(el);
+        game.zones.push({
+          x,
+          y,
+          r: 48,
+          timer: 2.0,
+          tickCooldown: 0,
+          el,
+        });
+      }
+
+      // =========================================================================
+      // EMP 緊急脈衝炸彈
+      // =========================================================================
+      let bombKeyLock = false;
+      function triggerEmpBomb(sourcePlayer) {
+        if (game.bombs <= 0) return;
+        game.bombs -= 1;
+        sfx.empBomb();
+        showToast("EMP 電磁脈衝釋放！全場彈幕清除＆水晶全數吸引至身邊！");
+
+        spawnShockwave(sourcePlayer.x, sourcePlayer.y, 680, "#72efdd");
+
+        const clearedCount = game.enemyBullets.length;
+        for (const b of game.enemyBullets) {
+          b.dead = true;
+          b.el.remove();
+        }
+        game.enemyBullets = [];
+        layers.enemyBullets.innerHTML = "";
+        if (clearedCount > 0) {
+          game.score += clearedCount * 15;
+          spawnFloatingText(
+            sourcePlayer.x,
+            sourcePlayer.y - 36,
+            `EMP 消彈 +${clearedCount * 15}`,
+            "#72efdd"
+          );
+        }
+
+        for (const e of game.enemies) {
+          damageEnemy(e, 180);
+        }
+        if (game.boss && game.boss.hp > 0) {
+          damageBoss(320);
+        }
+
+        for (const item of game.items) {
+          item.magnetTarget = sourcePlayer;
+        }
+      }
+
+      // =========================================================================
+      // 掉落物：彈跳變色水晶 與 維修扳手
+      // =========================================================================
+      function spawnCrystal(x, y, initialColor = "red") {
+        if (game.items.length > 30) return;
+        const colorIdx = Math.max(0, CRYSTAL_ORDER.indexOf(initialColor));
+        const g = createSVG("g", {
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+        });
+        const useIcon = createSVG("use", {
+          href: `#icon-crystal-${CRYSTAL_ORDER[colorIdx]}`,
+          x: "-40",
+          y: "-40",
+          transform: "scale(0.68)",
+        });
+        g.appendChild(useIcon);
+        layers.items.appendChild(g);
+
+        const maxBounces = selectedPerk === "crystal" ? 9 : 6;
+        game.items.push({
+          id: nextEntityId++,
+          kind: "crystal",
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 90,
+          vy: -95,
+          r: 22,
+          colorIdx,
+          bouncesLeft: maxBounces,
+          hitCooldown: 0,
+          magnetTarget: null,
+          el: g,
+          useEl: useIcon,
+        });
+      }
+
+      function spawnWrench(x, y) {
+        if (game.items.length > 30) return;
+        const g = createSVG("g", {
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+        });
+        g.appendChild(createSVG("use", { href: "#icon-wrench" }));
+        layers.items.appendChild(g);
+
+        game.items.push({
+          id: nextEntityId++,
+          kind: "wrench",
+          x,
+          y,
+          vx: (Math.random() - 0.5) * 55,
+          vy: 75,
+          r: 20,
+          magnetTarget: null,
+          el: g,
+        });
+      }
+
+      function hitCrystalWithBullet(item) {
+        if (item.kind !== "crystal" || item.hitCooldown > 0 || item.bouncesLeft <= 0) return false;
+        item.hitCooldown = 0.18;
+        item.bouncesLeft -= 1;
+        item.vy = -215;
+        item.vx = (Math.random() - 0.5) * 135;
+        item.colorIdx = (item.colorIdx + 1) % 3;
+        const newColor = CRYSTAL_ORDER[item.colorIdx];
+        item.useEl.setAttribute("href", `#icon-crystal-${newColor}`);
+
+        game.crystalBounceCount += 1;
+        sfx.crystalPing(item.colorIdx);
+        const labelMap = { red: "紅:火神", blue: "藍:雷射", yellow: "黃:飛彈" };
+        const colorHex = { red: "#ff8fa3", blue: "#72efdd", yellow: "#ffd166" };
+        spawnFloatingText(item.x, item.y - 18, labelMap[newColor], colorHex[newColor]);
+        return true;
+      }
+
+      function collectItem(player, item) {
+        if (item.kind === "wrench") {
+          player.hp = Math.min(player.maxHp, player.hp + 35);
+          sfx.powerUp();
+          spawnFloatingText(player.x, player.y - 24, "HP +35 維修完成！", "#57cc99");
+          game.score += 400;
+          return;
+        }
+
+        const pickedColor = CRYSTAL_ORDER[item.colorIdx];
+        sfx.powerUp();
+
+        if (player.weaponColor === pickedColor) {
+          if (player.weaponLevel < 8) {
+            player.weaponLevel += 1;
+            const lvText = player.weaponLevel === 8 ? "Lv.8 (MAX)" : `Lv.${player.weaponLevel}`;
+            spawnFloatingText(player.x, player.y - 26, `武器進化 ${lvText}!`, "#ffd166");
+          } else {
+            spawnFloatingText(player.x, player.y - 26, "MAX 超載加分 +2000!", "#ffd166");
+          }
+          game.score += 450 * player.weaponLevel;
+        } else {
+          player.weaponColor = pickedColor;
+          spawnFloatingText(player.x, player.y - 26, `切換：${WEAPON_NAMES[pickedColor]}`, "#ffffff");
+          game.score += 300;
+        }
+
+        if (game.players.length > 1) {
+          for (const mate of game.players) {
+            mate.weaponColor = player.weaponColor;
+            mate.weaponLevel = Math.max(mate.weaponLevel, player.weaponLevel);
+          }
+        }
+
+        game.maxWeaponLevelReached = Math.max(game.maxWeaponLevelReached, player.weaponLevel);
+        updateWeaponBadges(player.weaponColor);
+      }
+
+      function updateWeaponBadges(activeColor) {
+        for (const c of CRYSTAL_ORDER) {
+          hud.badges[c].classList.toggle("active", c === activeColor);
+        }
+      }
+
+      // =========================================================================
+      // 12 種敵機生成、3 倍血量與適度彈幕邏輯 (敵方子彈數目已調降 1/2)
+      // =========================================================================
+      const ENEMY_CONFIG = {
+        buoy: { sprite: "#sprite-enemy-buoy", hp: 96, r: 22, vy: 70, score: 250, fireRate: 0 },
+        pan: { sprite: "#sprite-enemy-pan", hp: 138, r: 23, vy: 110, score: 380, fireRate: 1.45 },
+        fighter: { sprite: "#sprite-enemy-fighter", hp: 174, r: 22, vy: 125, score: 450, fireRate: 1.35 },
+        ladybug: { sprite: "#sprite-enemy-ladybug", hp: 105, r: 19, vy: 165, score: 320, fireRate: 1.75 },
+        saw: { sprite: "#sprite-enemy-saw", hp: 195, r: 24, vy: 140, score: 520, fireRate: 1.35 },
+        bomber: { sprite: "#sprite-enemy-bomber", hp: 320, r: 28, vy: 75, score: 680, fireRate: 1.85 },
+        prism: { sprite: "#sprite-enemy-prism", hp: 220, r: 23, vy: 95, score: 580, fireRate: 1.25 },
+        gunship: { sprite: "#sprite-enemy-gunship", hp: 420, r: 32, vy: 72, score: 850, fireRate: 1.15 },
+        shield_guard: { sprite: "#sprite-enemy-shield", hp: 480, r: 26, vy: 68, score: 920, fireRate: 1.3 },
+        mine_layer: { sprite: "#sprite-enemy-minelayer", hp: 260, r: 25, vy: 105, score: 640, fireRate: 1.65 },
+        carrier: { sprite: "#sprite-enemy-carrier", hp: 690, r: 36, vy: 56, score: 1500, fireRate: 1.3 },
+        mini_boss: { sprite: "#sprite-enemy-miniboss", hp: 2400, r: 58, vy: 45, score: 4000, fireRate: 1.05 },
+      };
+
+      function spawnEnemy(type, x, y, pattern = "straight", dropType = null) {
+        if (game.enemies.length > 48) return;
+        const cfg = ENEMY_CONFIG[type] || ENEMY_CONFIG.pan;
+        const g = createSVG("g", {
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+        });
+        g.appendChild(createSVG("use", { href: cfg.sprite }));
+        layers.enemies.appendChild(g);
+
+        const defaultDrop =
+          type === "buoy"
+            ? "crystal"
+            : type === "carrier" || type === "mini_boss"
+            ? "wrench"
+            : Math.random() < 0.26
+            ? "crystal"
+            : null;
+
+        game.enemies.push({
+          id: nextEntityId++,
+          type,
+          x,
+          startX: x,
+          y,
+          r: cfg.r,
+          hp: cfg.hp,
+          maxHp: cfg.hp,
+          vy: cfg.vy,
+          score: cfg.score,
+          pattern,
+          age: 0,
+          spinAngle: 0,
+          fireCooldown: 0.45 + Math.random() * 0.75,
+          fireRate: cfg.fireRate,
+          dropType: dropType !== null ? dropType : defaultDrop,
+          el: g,
+        });
+      }
+
+      function spawnEnemyBullet(x, y, vx, vy, opts = {}) {
+        if (game.enemyBullets.length > 180) return;
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(vx) || !Number.isFinite(vy)) return;
+        const isHeavy = !!opts.isHeavy;
+        const isCluster = !!opts.isCluster;
+        const r = isCluster ? 10 : isHeavy ? 8.5 : 5.8;
+        const fill = isCluster ? "#ff0055" : isHeavy ? "#ff2a6d" : opts.color || "#ff9e00";
+
+        const c = createSVG("circle", {
+          cx: "0",
+          cy: "0",
+          r: String(r),
+          fill,
+          stroke: "#ffffff",
+          "stroke-width": "2",
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+        });
+        layers.enemyBullets.appendChild(c);
+        game.enemyBullets.push({
+          x,
+          y,
+          vx,
+          vy,
+          r,
+          age: 0,
+          dead: false,
+          dmg: isCluster ? 30 : isHeavy ? 32 : 18,
+          isHeavy: isHeavy || isCluster,
+          splitTimer: isCluster ? opts.splitTimer || 1.15 : 0,
+          splitCount: opts.splitCount || 3,
+          el: c,
+        });
+      }
+
+      // 12 種敵機攻擊模式 (子彈數目已全面減少 1/2)
+      function fireEnemyWeapon(e) {
+        const target =
+          game.players[Math.floor(Math.random() * game.players.length)] || game.players[0];
+        if (!target) return;
+        const dx = target.x - e.x;
+        const dy = target.y - e.y;
+        const baseAng = Math.atan2(dy, dx);
+
+        switch (e.type) {
+          case "buoy": {
+            // 氣球浮標專注作為水晶補給來源，不發射子彈
+            break;
+          }
+          case "pan": {
+            // 紫晶太陽圓盤機：1 發太陽狙擊彈 (原 2 發減半)
+            spawnEnemyBullet(e.x, e.y + 12, Math.cos(baseAng) * 255, Math.sin(baseAng) * 255, {
+              color: "#ffb703",
+            });
+            break;
+          }
+          case "fighter": {
+            // 銅翼螺旋槳機：2 路扇形快彈 (原 3 路減半)
+            for (const offset of [-0.14, 0.14]) {
+              const ang = baseAng + offset;
+              spawnEnemyBullet(e.x, e.y + 16, Math.cos(ang) * 270, Math.sin(ang) * 270);
+            }
+            break;
+          }
+          case "ladybug": {
+            // 發條瓢蟲：單發自機狙 (射速已減半)
+            spawnEnemyBullet(e.x, e.y + 12, Math.cos(baseAng) * 290, Math.sin(baseAng) * 290, {
+              color: "#ff4d6d",
+            });
+            break;
+          }
+          case "saw": {
+            // 齒輪旋刃機：4 向十字刀波彈 (原 8 向減半)
+            for (let i = 0; i < 4; i++) {
+              const ang = e.age * 2.2 + (i * Math.PI) / 2;
+              spawnEnemyBullet(e.x, e.y, Math.cos(ang) * 230, Math.sin(ang) * 230, {
+                color: "#ffd166",
+              });
+            }
+            break;
+          }
+          case "bomber": {
+            // 熱氣球轟炸機：投擲延時 3 向分裂開花炸彈 (原 6 向減半)
+            spawnEnemyBullet(e.x, e.y + 18, Math.cos(baseAng) * 170, Math.sin(baseAng) * 170, {
+              isCluster: true,
+              splitTimer: 1.05,
+              splitCount: 3,
+            });
+            break;
+          }
+          case "prism": {
+            // 星芒稜鏡：2 發精準光束彈 (原 4 發減半)
+            for (const offset of [-0.08, 0.08]) {
+              const ang = baseAng + offset;
+              spawnEnemyBullet(e.x, e.y + 10, Math.cos(ang) * 310, Math.sin(ang) * 310, {
+                color: "#00f5d4",
+              });
+            }
+            break;
+          }
+          case "gunship": {
+            // 雙頭蒸汽重砲艇：左右砲管各射出 1 發 (共 2 顆，原 6 顆減半)
+            for (const offset of [-0.1, 0.1]) {
+              const ang = Math.PI / 2 + offset;
+              spawnEnemyBullet(e.x - 18, e.y + 20, Math.cos(ang) * 250, Math.sin(ang) * 250);
+            }
+            spawnEnemyBullet(e.x + 18, e.y + 20, Math.cos(baseAng) * 250, Math.sin(baseAng) * 250);
+            break;
+          }
+          case "shield_guard": {
+            // 重盾守衛：正面 2 路壓制彈 (原 5 路減半)
+            for (const offset of [-0.15, 0.15]) {
+              const ang = baseAng + offset;
+              spawnEnemyBullet(e.x, e.y + 16, Math.cos(ang) * 245, Math.sin(ang) * 245, {
+                color: "#4cc9f0",
+              });
+            }
+            break;
+          }
+          case "mine_layer": {
+            // 雲海布雷飛魚：布下 4 向開花感應雷 (原 8 向減半)
+            spawnEnemyBullet(e.x, e.y, (Math.random() - 0.5) * 60, 95, {
+              isCluster: true,
+              splitTimer: 0.95,
+              splitCount: 4,
+            });
+            break;
+          }
+          case "carrier": {
+            // 鐵甲鯨大型運輸飛艇：5 向環狀彈幕 (原 11 顆減半)
+            for (let i = 0; i < 5; i++) {
+              const ang = (i * Math.PI * 2) / 5 + e.age;
+              spawnEnemyBullet(e.x, e.y + 10, Math.cos(ang) * 210, Math.sin(ang) * 210);
+            }
+            break;
+          }
+          case "mini_boss": {
+            // 鋼鐵風車巡洋艦：左右雙發 + 中央 4 向開花彈 (原 18 顆減半)
+            for (const offset of [-0.14, 0.14]) {
+              const ang = baseAng + offset;
+              spawnEnemyBullet(e.x - 46, e.y + 16, Math.cos(ang) * 260, Math.sin(ang) * 260);
+              spawnEnemyBullet(e.x + 46, e.y + 16, Math.cos(ang) * 260, Math.sin(ang) * 260);
+            }
+            spawnEnemyBullet(e.x, e.y + 22, Math.cos(baseAng) * 205, Math.sin(baseAng) * 205, {
+              isCluster: true,
+              splitTimer: 1.0,
+              splitCount: 4,
+            });
+            break;
+          }
+        }
+      }
+
+      function damageEnemy(enemy, dmg, isPierceLaser = false) {
+        if (enemy.dead) return;
+        // 重盾守衛機正面減傷普通散彈，引導使用藍色貫穿雷射或蓄力重擊
+        const actualDmg =
+          enemy.type === "shield_guard" && !isPierceLaser ? dmg * 0.55 : dmg;
+        enemy.hp -= actualDmg;
+
+        if (enemy.hp <= 0) {
+          enemy.dead = true;
+          game.score += enemy.score;
+          sfx.explode(enemy.type === "carrier" || enemy.type === "mini_boss");
+          spawnExplosion(
+            enemy.x,
+            enemy.y,
+            enemy.type === "mini_boss" ? 64 : enemy.type === "carrier" ? 46 : 26
+          );
+
+          if (enemy.type === "mini_boss") {
+            spawnWrench(enemy.x - 28, enemy.y);
+            spawnCrystal(enemy.x, enemy.y, "red");
+            spawnCrystal(enemy.x + 28, enemy.y, "blue");
+            showToast("擊破中繼精英艦【鋼鐵風車巡洋艦】！獲得大量補給！");
+          } else if (enemy.dropType === "crystal") {
+            const colors = ["red", "blue", "yellow"];
+            spawnCrystal(enemy.x, enemy.y, colors[Math.floor(Math.random() * 3)]);
+          } else if (enemy.dropType === "wrench") {
+            spawnWrench(enemy.x - 16, enemy.y);
+            spawnCrystal(enemy.x + 16, enemy.y, "blue");
+          }
+        }
+      }
+
+      // =========================================================================
+      // 第一關守關 Boss：「碧空巨像・風車要塞號」(5 倍血量 = 11,000 HP，子彈數減少 1/2)
+      // =========================================================================
+      function spawnStage1Boss() {
+        showToast("WARNING! 守關首領【碧空巨像・風車要塞號 (HP 11,000)】降臨！");
+        hud.toast.style.display = "none";
+        hud.bossHud.style.display = "flex";
+
+        const root = createSVG("g", {
+          transform: "translate(300, -110)",
+        });
+        const bodyUse = createSVG("use", { href: "#sprite-boss-stage1" });
+
+        const leftRotor = createSVG("g", { transform: "translate(-95, 6)" });
+        const rightRotor = createSVG("g", { transform: "translate(95, 6)" });
+        [leftRotor, rightRotor].forEach((rotor) => {
+          for (let i = 0; i < 4; i++) {
+            rotor.appendChild(
+              createSVG("rect", {
+                x: "-5",
+                y: "-32",
+                width: "10",
+                height: "28",
+                rx: "4",
+                fill: "url(#brass-grad)",
+                stroke: "#24153d",
+                "stroke-width": "2.8",
+                transform: `rotate(${i * 90})`,
+              })
+            );
+          }
+          rotor.appendChild(
+            createSVG("circle", {
+              cx: "0",
+              cy: "0",
+              r: "10",
+              fill: "#48cae4",
+              stroke: "#24153d",
+              "stroke-width": "3",
+            })
+          );
+        });
+
+        root.appendChild(bodyUse);
+        root.appendChild(leftRotor);
+        root.appendChild(rightRotor);
+        layers.enemies.appendChild(root);
+
+        game.boss = {
+          id: nextEntityId++,
+          x: 300,
+          y: -110,
+          targetY: 135,
+          entered: false, // 獨立進場旗標，防止垂直浮動 y < targetY 時誤觸進場分支而卡死在左右兩側
+          r: 70,
+          hp: 11000,
+          maxHp: 11000,
+          angle: 0,
+          phaseTimer: 0,
+          attackCooldown: 1.2,
+          subAttackCooldown: 2.8,
+          buoyTimer: 5.5,
+          el: root,
+          leftRotor,
+          rightRotor,
+        };
+      }
+
+      function updateBoss(dt) {
+        const b = game.boss;
+        if (!b || b.hp <= 0) return;
+
+        if (!b.entered) {
+          b.y += 105 * dt;
+          if (b.y >= b.targetY) {
+            b.y = b.targetY;
+            b.entered = true;
+          }
+        } else {
+          b.phaseTimer += dt;
+          b.x = 300 + Math.sin(b.phaseTimer * 1.25) * 160;
+          b.y = b.targetY + Math.sin(b.phaseTimer * 1.9) * 22;
+        }
+
+        b.angle = (b.angle + 220 * dt) % 360;
+        b.el.setAttribute("transform", `translate(${b.x.toFixed(1)}, ${b.y.toFixed(1)})`);
+        b.leftRotor.setAttribute("transform", `translate(-95, 6) rotate(${b.angle.toFixed(1)})`);
+        b.rightRotor.setAttribute("transform", `translate(95, 6) rotate(${(-b.angle).toFixed(1)})`);
+
+        b.buoyTimer -= dt;
+        if (b.buoyTimer <= 0) {
+          b.buoyTimer = 6.2;
+          spawnEnemy("buoy", 80 + Math.random() * 440, -30, "straight", "crystal");
+          if (Math.random() < 0.45) {
+            spawnEnemy("pan", 100 + Math.random() * 400, -30, "sine");
+          }
+        }
+
+        const hpRatio = b.hp / b.maxHp;
+        const target = game.players[0];
+        const baseAng = target ? Math.atan2(target.y - b.y, target.x - b.x) : Math.PI / 2;
+
+        // 主砲彈幕循環 (子彈數已減半)
+        b.attackCooldown -= dt;
+        if (b.attackCooldown <= 0) {
+          if (hpRatio > 0.65) {
+            // Phase 1 (100%~65%)：雙風車 2 路扇形彈 + 中央自機狙 (原 11 顆減為 5 顆)
+            for (const offset of [-0.16, 0.16]) {
+              const ang1 = baseAng + offset;
+              spawnEnemyBullet(b.x - 95, b.y + 18, Math.cos(ang1) * 245, Math.sin(ang1) * 245);
+              spawnEnemyBullet(b.x + 95, b.y + 18, Math.cos(ang1) * 245, Math.sin(ang1) * 245);
+            }
+            spawnEnemyBullet(b.x, b.y + 22, Math.cos(baseAng) * 285, Math.sin(baseAng) * 285, {
+              isHeavy: true,
+            });
+            b.attackCooldown = 1.15;
+          } else if (hpRatio > 0.3) {
+            // Phase 2 (65%~30%)：6 向螺旋風車彈幕 (原 12 向減半)
+            for (let i = 0; i < 6; i++) {
+              const ang = (b.angle * Math.PI) / 180 + (i * Math.PI * 2) / 6;
+              spawnEnemyBullet(b.x, b.y + 10, Math.cos(ang) * 240, Math.sin(ang) * 240, {
+                color: "#00f5d4",
+              });
+            }
+            b.attackCooldown = 0.92;
+          } else {
+            // Phase 3 (<30% 狂暴型態)：8 向星辰脈衝彈雨 (原 16 向減半)
+            for (let i = 0; i < 8; i++) {
+              const ang = (b.angle * Math.PI) / 180 + (i * Math.PI * 2) / 8;
+              spawnEnemyBullet(b.x, b.y + 12, Math.cos(ang) * 265, Math.sin(ang) * 265, {
+                color: "#ff4d6d",
+              });
+            }
+            b.attackCooldown = 0.78;
+          }
+        }
+
+        // 副砲開花彈循環 (減半為單顆 4 向開花彈)
+        b.subAttackCooldown -= dt;
+        if (b.subAttackCooldown <= 0) {
+          spawnEnemyBullet(b.x, b.y + 20, Math.cos(baseAng) * 205, Math.sin(baseAng) * 205, {
+            isCluster: true,
+            splitTimer: 1.0,
+            splitCount: 4,
+          });
+          b.subAttackCooldown = hpRatio < 0.4 ? 2.1 : 2.7;
+        }
+
+        const pct = Math.max(0, Math.ceil((b.hp / b.maxHp) * 100));
+        hud.bossHpFill.style.width = `${pct}%`;
+        hud.bossHpPercent.textContent = `${pct}%`;
+      }
+
+      function damageBoss(dmg) {
+        const b = game.boss;
+        if (!b || b.hp <= 0) return;
+        b.hp -= dmg;
+        if (b.hp <= 0) {
+          b.hp = 0;
+          hud.bossHpFill.style.width = "0%";
+          hud.bossHpPercent.textContent = "0%";
+          game.score += 25000;
+          sfx.explode(true);
+          spawnExplosion(b.x, b.y, 75);
+          b.el.remove();
+          game.boss = null;
+          // 清空場上所有敵方子彈與圖層節點
+          for (const eb of game.enemyBullets) {
+            eb.dead = true;
+            eb.el.remove();
+          }
+          game.enemyBullets = [];
+          layers.enemyBullets.innerHTML = "";
+          game.bossDyingTimer = 1.25;
+        }
+      }
+
+      // =========================================================================
+      // 3 倍關卡長度與 3 倍高密度編隊產生器 (135 秒三大空域 + 2 場中 Boss 戰)
+      // =========================================================================
+      function buildStage1Schedule() {
+        const waves = [];
+        const add = (time, fn) => waves.push({ time, run: fn });
+
+        // --- 第一空域 (0s ~ 45s)：風車鎮外圍雲海 ---
+        add(1.0, () => {
+          showToast("PHASE 1：風車鎮外圍雲海 — 擊破浮標射擊水晶變色升級！");
+          spawnEnemy("buoy", 160, -30, "straight", "crystal");
+          spawnEnemy("buoy", 440, -50, "straight", "crystal");
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("pan", 110 + i * 95, -30 - i * 32, "sine");
+          }
+        });
+
+        add(5.0, () => {
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("ladybug", 90 + i * 82, -25 - i * 28, "dive");
+          }
+          spawnEnemy("buoy", 300, -40, "straight", "crystal");
+        });
+
+        add(9.5, () => {
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("fighter", 100 + i * 100, -30 - (i % 2) * 35, "straight");
+          }
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("pan", 150 + i * 100, -85, "sine");
+          }
+        });
+
+        add(14.0, () => {
+          showToast("注意：齒輪旋刃機與熱氣球轟炸機編隊接近！");
+          spawnEnemy("bomber", 180, -40, "straight");
+          spawnEnemy("bomber", 420, -40, "straight");
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("saw", 110 + i * 95, -75 - i * 25, "sine");
+          }
+          spawnEnemy("buoy", 300, -30, "straight", "crystal");
+        });
+
+        add(19.5, () => {
+          spawnEnemy("carrier", 300, -60, "straight", "wrench");
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("ladybug", 80 + i * 88, -30 - (i % 3) * 30, "dive");
+          }
+        });
+
+        add(25.0, () => {
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("prism", 120 + i * 120, -35 - i * 25, "sine");
+          }
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("fighter", 100 + i * 100, -90, "straight");
+          }
+          spawnEnemy("buoy", 200, -40, "straight", "crystal");
+          spawnEnemy("buoy", 400, -60, "straight", "crystal");
+        });
+
+        add(31.0, () => {
+          spawnEnemy("gunship", 190, -45, "straight");
+          spawnEnemy("gunship", 410, -45, "straight");
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("pan", 90 + i * 84, -85 - i * 22, "sine");
+          }
+        });
+
+        add(37.5, () => {
+          showToast("精英警戒！第一空域中繼艦【鋼鐵風車巡洋艦】登場！");
+          spawnEnemy("mini_boss", 300, -70, "hover", "wrench");
+          spawnEnemy("buoy", 110, -40, "straight", "crystal");
+          spawnEnemy("buoy", 490, -40, "straight", "crystal");
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("saw", 120 + i * 120, -95, "sine");
+          }
+        });
+
+        // --- 第二空域 (46s ~ 90s)：浮島峽谷防線與蒸汽艦隊 ---
+        add(46.0, () => {
+          showToast("PHASE 2：浮島峽谷防線 — 重盾遺跡守衛與布雷飛魚出沒！");
+          for (let i = 0; i < 3; i++) {
+            spawnEnemy("shield_guard", 150 + i * 150, -40, "straight");
+          }
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("prism", 100 + i * 100, -95, "sine");
+          }
+          spawnEnemy("buoy", 300, -50, "straight", "crystal");
+        });
+
+        add(52.0, () => {
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("mine_layer", 120 + i * 120, -35 - i * 30, "sine");
+          }
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("ladybug", 80 + i * 88, -80 - i * 20, "dive");
+          }
+        });
+
+        add(58.0, () => {
+          spawnEnemy("carrier", 180, -60, "straight", "wrench");
+          spawnEnemy("carrier", 420, -80, "straight", "crystal");
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("fighter", 100 + i * 100, -30, "straight");
+          }
+        });
+
+        add(64.5, () => {
+          for (let i = 0; i < 3; i++) {
+            spawnEnemy("bomber", 140 + i * 160, -40, "straight");
+          }
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("saw", 100 + i * 100, -90, "sine");
+          }
+          spawnEnemy("buoy", 160, -45, "straight", "crystal");
+          spawnEnemy("buoy", 440, -45, "straight", "crystal");
+        });
+
+        add(71.0, () => {
+          spawnEnemy("gunship", 150, -45, "straight");
+          spawnEnemy("gunship", 300, -65, "straight");
+          spawnEnemy("gunship", 450, -45, "straight");
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("pan", 90 + i * 84, -95, "sine");
+          }
+        });
+
+        add(77.5, () => {
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("shield_guard", 120 + i * 120, -40, "straight");
+          }
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("mine_layer", 140 + i * 110, -95, "sine");
+          }
+          spawnEnemy("buoy", 300, -35, "straight", "crystal");
+        });
+
+        add(84.0, () => {
+          showToast("雙重精英警戒！兩艘【鋼鐵風車巡洋艦】同時壓境！");
+          spawnEnemy("mini_boss", 190, -70, "hover", "wrench");
+          spawnEnemy("mini_boss", 410, -90, "hover", "crystal");
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("prism", 100 + i * 100, -40, "sine");
+          }
+        });
+
+        // --- 第三空域 (92s ~ 135s)：皇家飛艇編隊與暴風前哨 ---
+        add(93.0, () => {
+          showToast("PHASE 3：皇家飛艇主力防線 — 突破最後防線迎戰首領！");
+          for (let i = 0; i < 7; i++) {
+            spawnEnemy("ladybug", 75 + i * 75, -30 - i * 22, "dive");
+          }
+          spawnEnemy("bomber", 200, -55, "straight");
+          spawnEnemy("bomber", 400, -55, "straight");
+          spawnEnemy("buoy", 300, -40, "straight", "crystal");
+        });
+
+        add(99.5, () => {
+          spawnEnemy("carrier", 300, -60, "straight", "wrench");
+          spawnEnemy("gunship", 140, -45, "straight");
+          spawnEnemy("gunship", 460, -45, "straight");
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("saw", 100 + i * 100, -95, "sine");
+          }
+        });
+
+        add(106.0, () => {
+          for (let i = 0; i < 4; i++) {
+            spawnEnemy("shield_guard", 120 + i * 120, -40, "straight");
+          }
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("prism", 100 + i * 100, -90, "sine");
+          }
+          spawnEnemy("buoy", 180, -35, "straight", "crystal");
+          spawnEnemy("buoy", 420, -35, "straight", "crystal");
+        });
+
+        add(113.0, () => {
+          for (let i = 0; i < 5; i++) {
+            spawnEnemy("mine_layer", 100 + i * 100, -35 - i * 20, "sine");
+          }
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("fighter", 90 + i * 84, -85, "straight");
+          }
+        });
+
+        add(120.0, () => {
+          spawnEnemy("carrier", 170, -60, "straight", "wrench");
+          spawnEnemy("carrier", 430, -60, "straight", "wrench");
+          spawnEnemy("gunship", 300, -45, "straight");
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("pan", 90 + i * 84, -95, "sine");
+          }
+        });
+
+        add(127.0, () => {
+          showToast("首領前哨戰！拾取水晶與維修扳手做好決戰準備！");
+          spawnEnemy("buoy", 150, -30, "straight", "crystal");
+          spawnEnemy("buoy", 300, -45, "straight", "crystal");
+          spawnEnemy("buoy", 450, -30, "straight", "crystal");
+          for (let i = 0; i < 6; i++) {
+            spawnEnemy("ladybug", 90 + i * 84, -70, "dive");
+          }
+        });
+
+        add(BOSS_SPAWN_TIME, () => {
+          spawnStage1Boss();
+        });
+
+        return waves;
+      }
+
+      const STAGE_1_WAVES = buildStage1Schedule();
+
+      // =========================================================================
+      // 視覺特效 (嚴格控管數量上限，避免 DOM 膨脹卡頓)
+      // =========================================================================
+      function spawnExplosion(x, y, maxR = 30) {
+        if (game.fxList.length > 42) return;
+        const g = createSVG("g", {
+          transform: `translate(${x.toFixed(1)}, ${y.toFixed(1)})`,
+        });
+        const outer = createSVG("circle", {
+          cx: "0",
+          cy: "0",
+          r: "6",
+          fill: "#ff9e00",
+          stroke: "#ffffff",
+          "stroke-width": "3",
+        });
+        const inner = createSVG("circle", {
+          cx: "0",
+          cy: "0",
+          r: "3",
+          fill: "#fff3b0",
+        });
+        g.appendChild(outer);
+        g.appendChild(inner);
+        layers.fx.appendChild(g);
+
+        game.fxList.push({
+          kind: "explosion",
+          x,
+          y,
+          age: 0,
+          duration: 0.3,
+          maxR,
+          outer,
+          inner,
+          el: g,
+        });
+      }
+
+      function spawnShockwave(x, y, maxR, color = "#72efdd") {
+        if (game.fxList.length > 42) return;
+        const ring = createSVG("circle", {
+          cx: x.toFixed(1),
+          cy: y.toFixed(1),
+          r: "10",
+          fill: "none",
+          stroke: color,
+          "stroke-width": "5",
+        });
+        layers.fx.appendChild(ring);
+        game.fxList.push({
+          kind: "shockwave",
+          age: 0,
+          duration: 0.42,
+          maxR,
+          el: ring,
+        });
+      }
+
+      function spawnFloatingText(x, y, text, color = "#ffd166") {
+        if (game.fxList.length > 42) return;
+        const t = createSVG("text", {
+          x: x.toFixed(1),
+          y: y.toFixed(1),
+          fill: color,
+          stroke: "#1d143b",
+          "stroke-width": "3",
+          "paint-order": "stroke",
+          "font-size": "13.5",
+          "font-weight": "900",
+          "text-anchor": "middle",
+        });
+        t.textContent = text;
+        layers.fx.appendChild(t);
+        game.fxList.push({
+          kind: "text",
+          x,
+          y,
+          age: 0,
+          duration: 0.7,
+          el: t,
+        });
+      }
+
+      function damagePlayer(p, dmg) {
+        if (p.invulnTimer > 0) return;
+        p.timeSinceHit = 0;
+        p.invulnTimer = 0.9;
+
+        if (p.shield > 0) {
+          p.shield = Math.max(0, p.shield - dmg);
+          sfx.shieldHit();
+          spawnShockwave(p.x, p.y, 140, "#72efdd");
+          spawnFloatingText(p.x, p.y - 20, "護盾吸收！震開彈幕", "#72efdd");
+
+          // 僅標記 dead 並移除 DOM，不在巢狀呼叫中 splice 陣列，徹底避免索引錯位殘留子彈
+          for (const eb of game.enemyBullets) {
+            if (!eb.dead && !eb.isHeavy && Math.hypot(eb.x - p.x, eb.y - p.y) < 145) {
+              eb.dead = true;
+              eb.el.remove();
+            }
+          }
+        } else {
+          p.hp = Math.max(0, p.hp - dmg);
+          sfx.explode(false);
+          spawnExplosion(p.x, p.y, 28);
+          spawnFloatingText(p.x, p.y - 20, `-${dmg} HP`, "#ff5d8f");
+          if (p.hp <= 0) {
+            finishStage(false);
+          }
+        }
+      }
+
+      // =========================================================================
+      // 主遊戲迴圈 (含異常保護與貫穿判定去重，徹底杜絕當機與子彈殘留)
+      // =========================================================================
+      let lastTimestamp = 0;
+
+      function updateGame(dt) {
+        game.time += dt;
+        updateScenery(dt);
+        sfx.updateBgm(dt, !!game.boss);
+
+        // 若 Boss 已被擊破，倒數結束進入勝利結算
+        if (game.bossDyingTimer > 0) {
+          game.bossDyingTimer -= dt;
+          if (game.bossDyingTimer <= 0) {
+            finishStage(true);
+            return;
+          }
+        }
+
+        while (
+          game.waveIndex < STAGE_1_WAVES.length &&
+          game.time >= STAGE_1_WAVES[game.waveIndex].time
+        ) {
+          STAGE_1_WAVES[game.waveIndex].run();
+          game.waveIndex += 1;
+        }
+
+        // 更新玩家
+        let anyBombPressed = false;
+        for (const p of game.players) {
+          if (isPlayerBombPressed(p)) {
+            anyBombPressed = true;
+            if (!bombKeyLock) {
+              bombKeyLock = true;
+              triggerEmpBomb(p);
+            }
+          }
+
+          const { dx, dy } = getPlayerMoveVector(p);
+          const moveScale = p.megaBeamTimer > 0 ? 0.58 : 1.0;
+          p.x = Math.max(30, Math.min(STAGE_W - 30, p.x + dx * p.speed * moveScale * dt));
+          p.y = Math.max(36, Math.min(STAGE_H - 36, p.y + dy * p.speed * moveScale * dt));
+
+          if (p.invulnTimer > 0) p.invulnTimer -= dt;
+          p.timeSinceHit += dt;
+
+          const rechargeDelay = selectedPerk === "shield" ? 2.0 : 3.0;
+          const rechargeRate = selectedPerk === "shield" ? 38 : 28;
+          if (p.timeSinceHit >= rechargeDelay && p.shield < p.maxShield) {
+            p.shield = Math.min(p.maxShield, p.shield + rechargeRate * dt);
+          }
+
+          p.fireCooldown -= dt;
+          const firing = isPlayerFiring(p);
+          const releaseSpecial = isPlayerReleaseSpecialKey(p);
+
+          if (firing) {
+            if (p.fireCooldown <= 0 && p.megaBeamTimer <= 0) {
+              firePrimaryWeapon(p);
+            }
+            const chargeSpeed = selectedPerk === "weapon" ? 72 : 56;
+            p.charge = Math.min(100, p.charge + chargeSpeed * dt);
+          } else if (p.wasFiring && p.charge >= 100) {
+            triggerChargedAttack(p);
+          }
+          if (releaseSpecial && p.charge >= 100) {
+            triggerChargedAttack(p);
+          }
+          p.wasFiring = firing;
+
+          // 藍色離子巨砲持續判定
+          if (p.megaBeamTimer > 0) {
+            p.megaBeamTimer -= dt;
+            p.megaBeamEl.setAttribute("opacity", "0.92");
+            for (const e of game.enemies) {
+              if (!e.dead && Math.abs(e.x - p.x) < 74 + e.r && e.y < p.y) {
+                damageEnemy(e, 380 * dt, true);
+              }
+            }
+            if (game.boss && Math.abs(game.boss.x - p.x) < 74 + game.boss.r) {
+              damageBoss(450 * dt);
+            }
+            for (const eb of game.enemyBullets) {
+              if (!eb.dead && Math.abs(eb.x - p.x) < 76 && eb.y < p.y) {
+                eb.dead = true;
+                eb.el.remove();
+              }
+            }
+          } else {
+            p.megaBeamEl.setAttribute("opacity", "0");
+          }
+
+          p.el.setAttribute("transform", `translate(${p.x.toFixed(1)}, ${p.y.toFixed(1)})`);
+          p.shieldEl.setAttribute(
+            "opacity",
+            p.shield > 0 ? (0.35 + (p.shield / 100) * 0.55).toFixed(2) : "0"
+          );
+          if (p.charge >= 25) {
+            p.chargeOrbEl.setAttribute("r", (4 + (p.charge / 100) * 9).toFixed(1));
+            p.chargeOrbEl.setAttribute("opacity", p.charge >= 100 ? "1" : "0.65");
+          } else {
+            p.chargeOrbEl.setAttribute("opacity", "0");
+          }
+        }
+        if (!anyBombPressed) bombKeyLock = false;
+
+        // 雙人能量連結光束
+        if (game.players.length === 2) {
+          const [p1, p2] = game.players;
+          const dist = Math.hypot(p1.x - p2.x, p1.y - p2.y);
+          if (!game.coopBeamEl) {
+            game.coopBeamEl = createSVG("line", {
+              stroke: "#72efdd",
+              "stroke-width": "5",
+              "stroke-dasharray": "8 4",
+              opacity: "0",
+            });
+            layers.playerBullets.appendChild(game.coopBeamEl);
+          }
+          if (dist < 200) {
+            game.coopBeamEl.setAttribute("x1", p1.x.toFixed(1));
+            game.coopBeamEl.setAttribute("y1", p1.y.toFixed(1));
+            game.coopBeamEl.setAttribute("x2", p2.x.toFixed(1));
+            game.coopBeamEl.setAttribute("y2", p2.y.toFixed(1));
+            game.coopBeamEl.setAttribute("opacity", "0.85");
+            for (const eb of game.enemyBullets) {
+              const mx = (p1.x + p2.x) * 0.5;
+              const my = (p1.y + p2.y) * 0.5;
+              if (!eb.dead && !eb.isHeavy && Math.hypot(eb.x - mx, eb.y - my) < dist * 0.45) {
+                eb.dead = true;
+                eb.el.remove();
+              }
+            }
+          } else {
+            game.coopBeamEl.setAttribute("opacity", "0");
+          }
+        }
+
+        // 更新玩家子彈
+        for (let i = game.playerBullets.length - 1; i >= 0; i--) {
+          const b = game.playerBullets[i];
+          b.age = (b.age || 0) + dt;
+
+          // 黃色蜂巢追蹤飛彈：僅在有限導引時間 (0.55s) 內對「正前方扇形視野」微幅修正，不掉頭、不無限盤旋
+          if (b.homing && b.homingFuel > 0) {
+            b.homingFuel -= dt;
+            let nearest = null;
+            let bestDist = 340;
+            for (const e of game.enemies) {
+              if (e.dead) continue;
+              // 僅鎖定位於飛彈前方 (上方) 且橫向偏角合理的目標
+              if (e.y < b.y - 20 && Math.abs(e.x - b.x) < 210) {
+                const d = Math.hypot(e.x - b.x, e.y - b.y);
+                if (d < bestDist) {
+                  bestDist = d;
+                  nearest = e;
+                }
+              }
+            }
+            if (game.boss && !nearest && game.boss.y < b.y - 20) {
+              nearest = game.boss;
+            }
+            if (nearest) {
+              const dx = nearest.x - b.x;
+              const dy = nearest.y - b.y;
+              const len = Math.hypot(dx, dy) || 1;
+              const desiredVx = Math.max(-280, Math.min(280, (dx / len) * 460));
+              b.vx += (desiredVx - b.vx) * 3.8 * dt;
+              b.vy = Math.min(-380, b.vy - 180 * dt); // 始終保持高速向上飛行，絕不往回飛
+            }
+          }
+
+          b.x += b.vx * dt;
+          b.y += b.vy * dt;
+          if (b.type === "yellow") {
+            const rotDeg = ((Math.atan2(b.vx, -b.vy) * 180) / Math.PI).toFixed(1);
+            b.el.setAttribute(
+              "transform",
+              `translate(${b.x.toFixed(1)}, ${b.y.toFixed(1)}) rotate(${rotDeg})`
+            );
+          } else {
+            b.el.setAttribute("transform", `translate(${b.x.toFixed(1)}, ${b.y.toFixed(1)})`);
+          }
+
+          if (b.type === "napalm") {
+            b.napalmTimer -= dt;
+            if (b.napalmTimer <= 0) {
+              spawnFireZone(b.x, b.y);
+              b.el.remove();
+              game.playerBullets.splice(i, 1);
+              continue;
+            }
+          }
+
+          // 射擊水晶變色彈跳 (貫穿雷射每顆水晶僅觸發一次)
+          let removed = false;
+          for (const item of game.items) {
+            if (
+              item.kind === "crystal" &&
+              Math.hypot(b.x - item.x, b.y - item.y) < b.r + item.r
+            ) {
+              if (b.hitEntities && b.hitEntities.has(item.id)) continue;
+              if (hitCrystalWithBullet(item)) {
+                if (b.hitEntities) {
+                  b.hitEntities.add(item.id);
+                } else {
+                  b.el.remove();
+                  game.playerBullets.splice(i, 1);
+                  removed = true;
+                  break;
+                }
+              }
+            }
+          }
+          if (removed) continue;
+
+          // 藍色電漿雷射消除小型能量彈
+          if (b.cancelSmallBullets) {
+            for (const eb of game.enemyBullets) {
+              if (!eb.dead && !eb.isHeavy && Math.hypot(b.x - eb.x, b.y - eb.y) < b.r + eb.r + 6) {
+                eb.dead = true;
+                eb.el.remove();
+              }
+            }
+          }
+
+          // 命中敵機 (貫穿雷射對同一敵機只判定一次傷害，防止每幀重複觸發卡死)
+          for (const e of game.enemies) {
+            if (!e.dead && Math.hypot(b.x - e.x, b.y - e.y) < b.r + e.r) {
+              if (b.hitEntities && b.hitEntities.has(e.id)) continue;
+              damageEnemy(e, b.dmg, b.pierce);
+              if (b.type === "napalm") spawnFireZone(b.x, b.y);
+              if (b.hitEntities) {
+                b.hitEntities.add(e.id);
+              } else {
+                b.el.remove();
+                game.playerBullets.splice(i, 1);
+                removed = true;
+                break;
+              }
+            }
+          }
+          if (removed) continue;
+
+          // 命中 Boss
+          if (game.boss && Math.hypot(b.x - game.boss.x, b.y - game.boss.y) < b.r + game.boss.r) {
+            if (!b.hitEntities || !b.hitEntities.has(game.boss.id)) {
+              if (b.hitEntities && game.boss) b.hitEntities.add(game.boss.id);
+              damageBoss(b.dmg);
+              if (b.type === "napalm") spawnFireZone(b.x, b.y);
+              if (!b.pierce) {
+                b.el.remove();
+                game.playerBullets.splice(i, 1);
+                continue;
+              }
+            }
+          }
+
+          if (b.y < -50 || b.y > STAGE_H + 50 || b.x < -50 || b.x > STAGE_W + 50) {
+            b.el.remove();
+            game.playerBullets.splice(i, 1);
+          }
+        }
+
+        // 更新紅色蓄力火焰灼燒區
+        for (let i = game.zones.length - 1; i >= 0; i--) {
+          const z = game.zones[i];
+          z.timer -= dt;
+          z.tickCooldown -= dt;
+          if (z.tickCooldown <= 0) {
+            z.tickCooldown = 0.22;
+            for (const e of game.enemies) {
+              if (!e.dead && Math.hypot(e.x - z.x, e.y - z.y) < z.r + e.r) {
+                damageEnemy(e, 26, true);
+              }
+            }
+            if (game.boss && Math.hypot(game.boss.x - z.x, game.boss.y - z.y) < z.r + game.boss.r) {
+              damageBoss(32);
+            }
+          }
+          z.el.setAttribute("opacity", Math.max(0, z.timer / 2.0).toFixed(2));
+          if (z.timer <= 0) {
+            z.el.remove();
+            game.zones.splice(i, 1);
+          }
+        }
+
+        // 更新 12 種敵機移動與開火
+        for (let i = game.enemies.length - 1; i >= 0; i--) {
+          const e = game.enemies[i];
+          if (e.dead) {
+            e.el.remove();
+            game.enemies.splice(i, 1);
+            continue;
+          }
+          e.age += dt;
+
+          if (e.pattern === "hover") {
+            // 中繼精英艦懸停橫移（超過 24 秒後向下離場，不永久滯留）
+            if (e.y < 145) e.y += e.vy * 1.4 * dt;
+            else if (e.age > 24) e.y += e.vy * 1.2 * dt;
+            e.x = e.startX + Math.sin(e.age * 1.4) * 90;
+          } else if (e.pattern === "dive") {
+            e.y += e.vy * dt;
+            e.x = e.startX + Math.sin(e.age * 3.8) * 85;
+          } else if (e.pattern === "sine") {
+            e.y += e.vy * dt;
+            e.x = e.startX + Math.sin(e.age * 2.6) * 72;
+          } else {
+            e.y += e.vy * dt;
+          }
+
+          e.x = Math.max(36, Math.min(STAGE_W - 36, e.x));
+
+          if (e.type === "saw") {
+            e.spinAngle = (e.spinAngle + 280 * dt) % 360;
+            e.el.setAttribute(
+              "transform",
+              `translate(${e.x.toFixed(1)}, ${e.y.toFixed(1)}) rotate(${e.spinAngle.toFixed(1)})`
+            );
+          } else {
+            e.el.setAttribute("transform", `translate(${e.x.toFixed(1)}, ${e.y.toFixed(1)})`);
+          }
+
+          if (e.fireRate > 0) {
+            e.fireCooldown -= dt;
+            if (e.fireCooldown <= 0 && e.y > 24 && e.y < STAGE_H - 130) {
+              e.fireCooldown = e.fireRate;
+              fireEnemyWeapon(e);
+            }
+          }
+
+          for (const p of game.players) {
+            if (Math.hypot(e.x - p.x, e.y - p.y) < e.r + p.radius) {
+              damagePlayer(p, 35);
+              damageEnemy(e, 90, true);
+            }
+          }
+
+          if (e.y > STAGE_H + 80) {
+            e.el.remove();
+            game.enemies.splice(i, 1);
+          }
+        }
+
+        updateBoss(dt);
+
+        // 更新掉落水晶與維修扳手
+        for (let i = game.items.length - 1; i >= 0; i--) {
+          const item = game.items[i];
+          if (item.hitCooldown > 0) item.hitCooldown -= dt;
+
+          const pullRadius = selectedPerk === "crystal" ? 125 : 75;
+          let targetPlayer = item.magnetTarget;
+          if (!targetPlayer) {
+            for (const p of game.players) {
+              if (Math.hypot(p.x - item.x, p.y - item.y) < pullRadius) {
+                targetPlayer = p;
+                break;
+              }
+            }
+          }
+
+          if (targetPlayer) {
+            const dx = targetPlayer.x - item.x;
+            const dy = targetPlayer.y - item.y;
+            const len = Math.hypot(dx, dy) || 1;
+            const pullSpd = item.magnetTarget ? 560 : 300;
+            item.x += (dx / len) * pullSpd * dt;
+            item.y += (dy / len) * pullSpd * dt;
+          } else {
+            item.vy = Math.min(135, item.vy + 250 * dt);
+            item.x += item.vx * dt;
+            item.y += item.vy * dt;
+            if (item.x < 36 || item.x > STAGE_W - 36) {
+              item.vx *= -1;
+              item.x = Math.max(36, Math.min(STAGE_W - 36, item.x));
+            }
+          }
+
+          item.el.setAttribute("transform", `translate(${item.x.toFixed(1)}, ${item.y.toFixed(1)})`);
+
+          let picked = false;
+          for (const p of game.players) {
+            if (Math.hypot(p.x - item.x, p.y - item.y) < p.radius + item.r) {
+              collectItem(p, item);
+              item.el.remove();
+              game.items.splice(i, 1);
+              picked = true;
+              break;
+            }
+          }
+          if (picked) continue;
+
+          if (item.y > STAGE_H + 50) {
+            item.el.remove();
+            game.items.splice(i, 1);
+          }
+        }
+
+        // 更新敵方彈幕（統一標記清理，杜絕巢狀 splice 導致的子彈殘留問題）
+        const pendingSplits = [];
+        for (let i = 0; i < game.enemyBullets.length; i++) {
+          const eb = game.enemyBullets[i];
+          if (eb.dead) {
+            eb.el.remove();
+            continue;
+          }
+
+          eb.age += dt;
+          eb.x += eb.vx * dt;
+          eb.y += eb.vy * dt;
+          eb.el.setAttribute("transform", `translate(${eb.x.toFixed(1)}, ${eb.y.toFixed(1)})`);
+
+          if (eb.splitTimer > 0) {
+            eb.splitTimer -= dt;
+            if (eb.splitTimer <= 0) {
+              pendingSplits.push({
+                x: eb.x,
+                y: eb.y,
+                count: eb.splitCount || 3,
+              });
+              eb.dead = true;
+              eb.el.remove();
+              continue;
+            }
+          }
+
+          for (const p of game.players) {
+            if (Math.hypot(eb.x - p.x, eb.y - p.y) < eb.r + p.radius - 3) {
+              eb.dead = true;
+              eb.el.remove();
+              damagePlayer(p, eb.dmg);
+              break;
+            }
+          }
+          if (eb.dead) continue;
+
+          if (
+            eb.age > 9.0 ||
+            eb.y > STAGE_H + 40 ||
+            eb.y < -40 ||
+            eb.x < -40 ||
+            eb.x > STAGE_W + 40
+          ) {
+            eb.dead = true;
+            eb.el.remove();
+          }
+        }
+
+        // 統一過濾存活子彈
+        game.enemyBullets = game.enemyBullets.filter((eb) => {
+          if (eb.dead) {
+            eb.el.remove();
+            return false;
+          }
+          return true;
+        });
+
+        // 安全加入分裂子彈
+        for (const sp of pendingSplits) {
+          for (let k = 0; k < sp.count; k++) {
+            const ang = (k * Math.PI * 2) / sp.count;
+            spawnEnemyBullet(sp.x, sp.y, Math.cos(ang) * 205, Math.sin(ang) * 205, {
+              color: "#ffd166",
+            });
+          }
+        }
+
+        // DOM 孤兒節點防護：確保圖層內不會殘留任何不在陣列中的子彈節點
+        if (layers.enemyBullets.childNodes.length !== game.enemyBullets.length) {
+          const validEls = new Set(game.enemyBullets.map((b) => b.el));
+          for (let i = layers.enemyBullets.childNodes.length - 1; i >= 0; i--) {
+            const node = layers.enemyBullets.childNodes[i];
+            if (!validEls.has(node)) {
+              node.remove();
+            }
+          }
+        }
+
+        // 更新特效
+        for (let i = game.fxList.length - 1; i >= 0; i--) {
+          const fx = game.fxList[i];
+          fx.age += dt;
+          const p = Math.min(1, fx.age / fx.duration);
+          if (fx.kind === "explosion") {
+            fx.outer.setAttribute("r", (6 + fx.maxR * p).toFixed(1));
+            fx.inner.setAttribute("r", (3 + fx.maxR * 0.6 * p).toFixed(1));
+            fx.el.setAttribute("opacity", (1 - p).toFixed(2));
+          } else if (fx.kind === "shockwave") {
+            fx.el.setAttribute("r", (12 + fx.maxR * p).toFixed(1));
+            fx.el.setAttribute("opacity", (1 - p).toFixed(2));
+          } else if (fx.kind === "text") {
+            fx.el.setAttribute("y", (fx.y - p * 28).toFixed(1));
+            fx.el.setAttribute("opacity", (1 - p).toFixed(2));
+          }
+          if (fx.age >= fx.duration) {
+            fx.el.remove();
+            game.fxList.splice(i, 1);
+          }
+        }
+
+        // 更新外部頂部 HUD
+        const p1 = game.players[0];
+        if (p1) {
+          hud.shieldFill.style.width = `${Math.round(p1.shield)}%`;
+          hud.shieldText.textContent = Math.round(p1.shield);
+          hud.hpFill.style.width = `${Math.round(p1.hp)}%`;
+          hud.hpText.textContent = Math.round(p1.hp);
+          hud.chargeFill.style.width = `${Math.round(p1.charge)}%`;
+          hud.chargeText.textContent = `${Math.round(p1.charge)}%`;
+
+          const progPct = Math.min(100, Math.round((game.time / BOSS_SPAWN_TIME) * 100));
+          hud.progressFill.style.width = `${progPct}%`;
+          hud.progressText.textContent = progPct >= 100 ? "BOSS" : `${progPct}%`;
+
+          hud.score.textContent = String(Math.floor(game.score)).padStart(6, "0");
+          hud.bombCount.textContent = game.bombs;
+
+          const lvStr = p1.weaponLevel === 8 ? "Lv.8 (MAX)" : `Lv.${p1.weaponLevel}`;
+          const colorMap = { red: "#ff8fa3", blue: "#72efdd", yellow: "#ffd166" };
+          hud.weaponTag.style.color = colorMap[p1.weaponColor];
+          hud.weaponTag.textContent = `${WEAPON_NAMES[p1.weaponColor]} ${lvStr}`;
+        }
+      }
+
+      function loop(timestamp) {
+        if (!game.running) return;
+        const dt = Math.min(0.04, Math.max(0.001, (timestamp - lastTimestamp) / 1000 || 0.016));
+        lastTimestamp = timestamp;
+        if (!game.paused) {
+          try {
+            updateGame(dt);
+          } catch (err) {
+            console.error("Game frame error:", err);
+          }
+        }
+        if (game.running) {
+          requestAnimationFrame(loop);
+        }
+      }
+
+      // =========================================================================
+      // 遊戲啟動、暫停與結算控制
+      // =========================================================================
+      function startGame() {
+        sfx.init();
+        sfx.resetBgm();
+        document.getElementById("screen-start").classList.add("hidden");
+        document.getElementById("screen-gallery").classList.add("hidden");
+        document.getElementById("screen-result").classList.add("hidden");
+
+        layers.zones.innerHTML = "";
+        layers.items.innerHTML = "";
+        layers.enemies.innerHTML = "";
+        layers.playerBullets.innerHTML = "";
+        layers.players.innerHTML = "";
+        layers.enemyBullets.innerHTML = "";
+        layers.fx.innerHTML = "";
+        hud.bossHud.style.display = "none";
+        hud.toast.style.display = "block";
+
+        game.time = 0;
+        game.score = 0;
+        game.bombs = 3;
+        game.maxWeaponLevelReached = 1;
+        game.crystalBounceCount = 0;
+        game.players = [];
+        game.playerBullets = [];
+        game.enemies = [];
+        game.enemyBullets = [];
+        game.items = [];
+        game.zones = [];
+        game.fxList = [];
+        game.boss = null;
+        game.bossDyingTimer = 0;
+        game.waveIndex = 0;
+        game.coopBeamEl = null;
+        game.paused = false;
+        game.running = true;
+
+        initScenery();
+
+        if (selectedMode === 1) {
+          game.players.push(createPlayer(1, 300, 690));
+        } else {
+          game.players.push(createPlayer(1, 230, 690));
+          game.players.push(createPlayer(2, 370, 690));
+        }
+
+        updateWeaponBadges("red");
+        lastTimestamp = performance.now();
+        requestAnimationFrame(loop);
+      }
+
+      function finishStage(victory) {
+        game.running = false;
+        const screen = document.getElementById("screen-result");
+        const title = document.getElementById("result-title");
+        const sub = document.getElementById("result-subtitle");
+        screen.classList.remove("hidden");
+
+        if (victory) {
+          title.textContent = "STAGE 1 CLEAR!";
+          title.style.color = "#ffd166";
+          sub.textContent = "恭喜突破 3 倍長征「第一關：碧空浮島（雲海與風車鎮）」！";
+        } else {
+          title.textContent = "MISSION FAILED";
+          title.style.color = "#ff5d8f";
+          sub.textContent = "裝甲耐久歸零，調整整備模組後再次升空挑戰吧！";
+        }
+
+        document.getElementById("stat-score").textContent = Math.floor(game.score).toLocaleString();
+        document.getElementById("stat-max-level").textContent =
+          game.maxWeaponLevelReached === 8 ? "MAX (Lv.8)" : `Lv.${game.maxWeaponLevelReached}`;
+        document.getElementById("stat-crystal-bounces").textContent = `${game.crystalBounceCount} 次`;
+        document.getElementById("stat-gears").textContent = victory ? "+10 枚星辰齒輪" : "+2 枚星辰齒輪";
+      }
+
+      function togglePause() {
+        if (!game.running) return;
+        game.paused = !game.paused;
+        document.getElementById("btn-pause").textContent = game.paused ? "繼續 (P)" : "暫停 (P)";
+        showToast(game.paused ? "遊戲已暫停 — 按 P 鍵繼續作戰" : "繼續作戰！");
+      }
+
+      // =========================================================================
+      // UI 按鈕事件綁定
+      // =========================================================================
+      document.querySelectorAll(".mode-pill").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          document.querySelectorAll(".mode-pill").forEach((b) => b.classList.remove("selected"));
+          btn.classList.add("selected");
+          selectedMode = Number(btn.dataset.mode);
+        });
+      });
+
+      document.querySelectorAll(".loadout-option").forEach((card) => {
+        card.addEventListener("click", () => {
+          document.querySelectorAll(".loadout-option").forEach((c) => c.classList.remove("selected"));
+          card.classList.add("selected");
+          selectedPerk = card.dataset.perk;
+        });
+      });
+
+      document.getElementById("btn-start-game").addEventListener("click", startGame);
+      document.getElementById("btn-replay").addEventListener("click", startGame);
+
+      document.getElementById("btn-back-loadout").addEventListener("click", () => {
+        document.getElementById("screen-result").classList.add("hidden");
+        document.getElementById("screen-start").classList.remove("hidden");
+      });
+
+      document.getElementById("btn-show-gallery").addEventListener("click", () => {
+        document.getElementById("screen-start").classList.add("hidden");
+        document.getElementById("screen-gallery").classList.remove("hidden");
+      });
+
+      document.getElementById("btn-open-gallery").addEventListener("click", () => {
+        if (game.running && !game.paused) togglePause();
+        document.getElementById("screen-gallery").classList.remove("hidden");
+      });
+
+      document.getElementById("btn-close-gallery").addEventListener("click", () => {
+        document.getElementById("screen-gallery").classList.add("hidden");
+        if (!game.running) {
+          document.getElementById("screen-start").classList.remove("hidden");
+        }
+      });
+
+      document.getElementById("btn-mute").addEventListener("click", (e) => {
+        sfx.muted = !sfx.muted;
+        e.target.textContent = sfx.muted ? "音效：靜音" : "音效：開啟";
+      });
+
+      document.getElementById("btn-pause").addEventListener("click", togglePause);
+
+      initScenery();
+      updateScenery(0.016);
+    })();
+  </script>
+</body>
+</html>
